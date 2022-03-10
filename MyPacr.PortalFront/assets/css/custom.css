@@ -1,0 +1,11 @@
+.invalid-input-group{
+    color: red;
+    border: 1px solid red;
+    border-radius: 0.35rem;
+}
+
+.invalid-input{
+    color: red;
+    border: 1px solid red;
+    border-radius: 0.35rem;
+}

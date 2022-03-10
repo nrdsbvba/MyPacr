@@ -1,0 +1,52 @@
+{
+  "directusSettings": {
+    "url": "https://localhost:8055",
+    "projectUrl": "_",
+    "token": "your_token",
+    "databaseSettings": {
+      "host": "https://localhost:3306",
+      "user": "username",
+      "password": "password",
+      "database": "DIRECTUS"
+    }
+  },
+  "portalSettings": {
+    "urlFront": "http://localhost:3000",
+    "urlAPI": "http://localhost:80/api"
+  },
+  "paymentProvider": {
+    "apiKey": "payment_api_key"
+  },
+  "localizationSettings": {
+    "language": "nl",
+    "timezone": "Europe/Brussels"
+  },
+  "passport": {
+    "tokenSecret": "secretToken"
+  },
+  "jwt": {
+    "secret": "JWTSecret"
+  },
+  "smartschoolAuthentication": {
+    "clientID": "1234abc",
+    "clientSecret": "1234abc"
+  },
+  "reporting": {
+    "passphrase": "daytona0overture96singular68Easing42gape51rusting17nereid86foliate34Flattest43fissile98Pravda76Meek"
+  },
+  "syncPassphrases": {
+    "classLists": "daytona0overture96singular68Easing42gape51rusting17nereid86foliate34Flattest43fissile98Pravda76Meek",
+    "users": "Thrusted54Akers22Curtsies48Dote13Variety14Flax96peacocks71pranks9lakeside57averts45Robinson29slur",
+    "merge": "Guttered51resists56gasser40prefixes66spacer76tom65Rowed73selkirk",
+    "repairAttendence": "torah52boswell8tear55Vendors50bungler16Adjoined8varistor30teased",
+    "fillfulldesc": "Hotbed77neonatal71nadine98Muddles64hoses42moravia68Cliffs73Pals",
+    "orderLineFix": "Sledge94spitfire66brayer82Biracial87thomson21Graphs21Spouses45bouts31document54Pianist"
+  },
+  "mail": {
+    "host": "smtp.office365.com",
+    "port": "587",
+    "user": "no-reply@example.be",
+    "password": "password",
+    "from": "\"Online Portal\" <no-reply@example.be>"
+  }
+}
