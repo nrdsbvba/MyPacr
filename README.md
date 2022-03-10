@@ -14,7 +14,6 @@ Andere features die aanwezig zijn:
 - Ondersteuning voor stoeltjes geld
 - Integratie met Smartschool
 - Automatisch gebruikers synchroniseren
-- **TODO**
 - Automatisch mails naar co-accounts sturen alseen kaart een laag saldo heeft
 - **TODO**
 
