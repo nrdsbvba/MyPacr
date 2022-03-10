@@ -35,13 +35,13 @@ Directus is nu klaar. Voor meer informatie over elke collection klik [hier](http
 ## 2. PortalAPi opzetten
 Installeer [Node.js](https://nodejs.org/en/download/)
 
-Download het PortalAPI project van [github](github.com/NRDS/MyPacr.PortalAPI).
+Download het PortalAPI project van [github](https://github.com/nrdsbvba/MyPacr/tree/main/MyPacr.PortalApi).
 
 In `PortalApi/config/` hernoem `example.json` naar `default.json`
 Pas alle gegevens aan:
 - **directusSettings**
 	- url: De url waar directus zich bevindt.
-	- projectUrl: Dit is het Directus project token, laat dit op '_' staan.
+	- projectUrl: Dit is het Directus project token, laat dit op "_" staan.
 	- token: zie de [Static Tokens](https://v8.docs.directus.io/api/authentication.html#tokens) op Directus V8 Docs.
 	- databaseSettings: De login en naam van de databank.
 - **portalSettings**
@@ -51,9 +51,9 @@ Pas alle gegevens aan:
 - **localizationSettings**
 	- De taal en tijdzone.
 - **passport**
-	- ==TODO==
+	- **TODO**
 - **jwt**
-	- ==TODO==
+	- **TODO**
 - **smartschoolAuthentication**
 	- Login gegevens om te synchroniseren met smartschool.
 - **reporting**
@@ -63,37 +63,37 @@ Pas alle gegevens aan:
 - **mail**
 	- Mail instellingen, vanwaar, en welk account worden automatische mails verstuurd.
 
-Na alles correct te hebben ingesteld, voer `node ./src/server.js` uit om de api te starten.
-
-Om in production te gaan: ==TODO==
+Na alles correct te hebben ingesteld, voer `node ./src/server.js` uit om de API te starten.
 
 ## 3. PortalFront opzetten
 
-Download het PortalFront project van [github](github.com/NRDS/MyPacr.PortalFront).
+Download het PortalFront project van [github](https://github.com/nrdsbvba/MyPacr/tree/main/MyPacr.PortalFront).
 
-Maak een bestand aan in de root folder genaamd: `.env`
-Plaats het volgende in dit bestand:
+Maak een bestand aan in de root folder genaamd `.env`.
+Plaats het volgende in dit bestand en pas de parameters aan naar wens:
 ```
 API_URL=http://localhost:80/api
 API_PORTALFRONT=http://localhost:3000
 SMARTSCHOOL_URL=schoolnaam.smartschool.be
 SMARTSCHOOL_CLIENTID=123456abc
 ```
-==PAS OP: Plaats geen spaties, voor of na de lijnen of de gelijkheids tekens.==
-Alternatief: plaats deze gegevens in systeem-variabelen.
+> PAS OP: Zorg dat er zich geen spaties in dit bestand bevinden.
+
+> Alternatief: plaats deze gegevens in systeem-variabelen.
+
 - API_URL is de url van het PortalAPI project
 - API_PORTALFRONT is de url van het PortalFront project
 - SMARTSCHOOL_URL is de url van smartschool
-- SMARTSCHOOL_CLIENTID is de id van smartschool. ==TODO==
+- SMARTSCHOOL_CLIENTID is de id van smartschool. **TODO**
 
 Zorg dat PortalAPI en Directus draaien en dat Terminal niet draait op deze PC.
 Voer het commando `node ./node\_modules/nuxt/bin/nuxt.js` uit om het PortalFront project te starten.
 
-Surf naar `localhost:3000/registreren`.
+Surf naar [`localhost:3000/registreren`](localhost:3000/registreren).
 Maak een account aan en log in.
 
 ## 4. Terminal opzetten
-Download het PortalFront project van [github](github.com/NRDS/MyPacr.Terminal).
+Download het PortalFront project van [github](https://github.com/nrdsbvba/MyPacr/tree/main/MyPacr.Terminal).
 
 Maak een bestand aan in de root folder genaamd: `.env`
 Plaats het volgende in dit bestand:
@@ -101,16 +101,18 @@ Plaats het volgende in dit bestand:
 DIRECTUS_API_URL=http://localhost
 DIRECTUS_API_TOKEN="token"
 ```
-==PAS OP: Plaats geen spaties, voor of na de lijnen of de gelijkheids tekens.==
-Alternatief: plaats deze gegevens in systeem-variabelen
+> PAS OP: Plaats geen spaties, voor of na de lijnen of de gelijkheids tekens.
+
+> Alternatief: plaats deze gegevens in systeem-variabelen
+
 - DIRECTUS_API_URL is de url waar Directus draait.
 - DIRECTUS_API_TOKEN is dezelfde [Static Token](https://v8.docs.directus.io/api/authentication.html#tokens) ingevuld in het PortalAPI-config bestand.
 
 Zorg dat PortalAPI en Directus draaien en dat PortalFront niet draait op deze PC.
 Voer het commando `node ./node\_modules/nuxt/bin/nuxt.js` uit om het Terminal project te starten.
 
-Surf naar `localhost:3000/`.
-==TODO== registreer een Terminal
+Surf naar [`localhost:3000/`](localhost:3000).
+**TODO** registreer een Terminal
 
 ## 5. Omnikey 5427 CK Smart-card readers
 De aangerade smart-card readers zijn de [Omnikey 5427 CK ](https://www.hidglobal.com/products/readers/omnikey/5427).
@@ -119,12 +121,15 @@ Aan 1 terminal kunnen 2 van deze lezers verbonden worden. Een voor het afrekenen
 
 Om de Omnikey 5427 CK in te stellen om elke lezing te eindigen met een `;` moet eerst de driver geinstaleerd worden, deze is [hier](https://www.hidglobal.com/drivers/28595) te vinden.
 
-Verbind de card-reader via USB en surf naar `http://192.168.63.99`
+Verbind vervolgens de card-reader via USB en surf naar [`http://192.168.63.99`](http://192.168.63.99)
 Klik op het tweede tab `Keyboard wedge` en vul `;` in bij `Card Out Event Keystroke`.
 
 ![image](./CardReader_1.PNG)
+
 Ga naar het voorlaatste tab `System Config`, klik op `Apply changes` en vervolgens op `Store changes`.
+
 ![image](./CardReader_2.PNG)
+
 De lezer geeft nu na elke lezing ook een `;`.
 
 ## 6. Mollie betalingsysteem
