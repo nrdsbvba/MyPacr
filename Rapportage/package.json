@@ -1,0 +1,40 @@
+{
+  "name": "rapportage",
+  "version": "1.0.0",
+  "description": "",
+  "main": "",
+  "scripts": {
+    "build": "parcel build src/page.vue -d ./dist --no-source-maps --global __DirectusExtension__",
+    "postbuild": "copyfiles -f src/meta.json ./dist",
+    "dev": "directus-extensions watch"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "GPL-3.0",
+  "dependencies": {
+    "@directus/sdk-js": "5.3.4",
+    "axios": "^0.19.2",
+    "babel-eslint": "^10.0.3",
+    "bluebird": "^3.7.2",
+    "bootstrap": "^4.4.1",
+    "bootstrap-vue": "^2.5.0",
+    "eslint": "^6.8.0",
+    "eslint-plugin-vue": "^5.2.3",
+    "jquery": "^3.4.1",
+    "js-file-download": "^0.4.10",
+    "jsonwebtoken": "^8.5.1",
+    "moment": "^2.24.0",
+    "serve-index": "^1.9.1",
+    "vue": "^2.6.11",
+    "vue-simple-suggest": "^1.10.1",
+    "vuejs-datepicker": "^1.6.2"
+  },
+  "devDependencies": {
+    "@vue/component-compiler-utils": "^2.6.0",
+    "copyfiles": "^2.2.0",
+    "cssnano": "^4.1.10",
+    "parcel-bundler": "^1.12.4",
+    "sass": "^1.25.0",
+    "vue-template-compiler": "^2.6.11"
+  }
+}

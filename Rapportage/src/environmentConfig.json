@@ -1,0 +1,15 @@
+{
+  "environment": "#_#{var_environmentName}#_#",
+  "directusSettings": {
+    "token": "#_#{var_directusSettings_token}#_#",
+    "url": "#_#{var_directusSettings_url}#_#"
+  },
+  "portalSettings": {
+    "fileLink": "#_#{var_portalSettings_fileLink}#_#",
+    "apiUrl": "#_#{var_portalSettings_apiUrl}#_#",
+    "tokenSettings": {
+      "passphrase": "#_#{var_portalSettings_tokenSettings_passphrase}#_#",
+      "key": "#_#{var_portalSettings_tokenSettings_key}#_#"
+    }
+  }
+}
