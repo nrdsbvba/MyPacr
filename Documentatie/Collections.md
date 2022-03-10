@@ -1,4 +1,4 @@
-#Collections
+# Collections
 - **Absences**: Deze collection bevat alle afwezigheden. Als een student niet aanwezig is op een dag, terwijl deze wel verwacht was, wordt dat hier ingevuld.
 - **Admin settings**: ==TODO==
 - **Admin Smartschool Import**: ==TODO==
