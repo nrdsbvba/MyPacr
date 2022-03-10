@@ -152,3 +152,62 @@ Maak een POST request naar de API endpoints in [syncController](https://github.c
 > Let op dat deze requests niet te vaak gebeuren! Te veel requests naar smartschool kan het account blokkeren of de API vertragen.
 
 Het is aangeraden deze requests te maken met een tool zoals [Postman](https://www.postman.com/)
+
+## 8. Rapportage extensie
+
+Download het Rapportage project van [github](https://github.com/nrdsbvba/MyPacr/tree/main/Raportage).
+
+Voer `npm install` uit in de root-folder om de nodige npm pakketen te installeren.
+Voer vervolgens `npm run build` uit.
+
+Kopieer de 3 nieuwe bestanden van `./dist` naar `directus/public/extensions/custom/modules/Rapportage`
+> Maak de folders aan indien nodig.
+
+Hernoem `page.js` en `page.css` naar `module.js` en `module.css` respectievelijk.
+
+Maak in de folder Rapportage een nieuw bestand aan genaamd `environmentConfig.json` en plaats het volgende in dit bestand (pas aan waar nodig):
+```
+{
+  "environment": "development",
+  "directusSettings": {
+    "token": "directus_token",
+    "url": "http://localhost:80"
+  },
+  "portalSettings": {
+    "fileLink": "http://localhost:80",
+    "apiUrl": "http://localhost:80/api",
+    "tokenSettings": {
+      "passphrase": "ABC123HIJ",
+      "key": "JWTSecret"
+    }
+  }
+}
+
+```
+
+Er is nu een nieuw tab beschikbaar in directus.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
