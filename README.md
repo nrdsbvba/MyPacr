@@ -1,4 +1,4 @@
-#MyPacr school kassa en registratie systeem
+# MyPacr school kassa en registratie systeem
 
 Het MyPacr software system werdt ontwikkeld door [NRDS](https://nrds.be/) in 2019. Door de corona-crisis is dit project stillgevallen. Om het geleverde werkt niet voor niets te hebben gedaan, is besloten dit open-source aan te bieden.
 
@@ -22,12 +22,12 @@ Andere features die aanwezig zijn:
 Voor meer informatie zie de [wiki](www.link-naar-de-wiki.com).
 
 
-# 1. [PortalAPI](google.com)
+# 1. [PortalAPI](https://github.com/nrdsbvba/MyPacr/tree/main/MyPacr.PortalApi)
 Het portalAPI is de backend API van het systeem dat onder andere de link legt tussen de UI en de databank/CMS. Dit project is een [Node.js](https://nodejs.org) [Express](https://expressjs.com/) server.
 
-## 2. PortalFront
+## 2. [PortalFront](https://github.com/nrdsbvba/MyPacr/tree/main/MyPacr.PortalFront)
 De portalfront is de plaats waar de co-accounts(aka ouders/voogden) de kaarten van de gebruikers kunnen bijladen. Dit is gemaakt met [Nuxt](https://nuxtjs.org/), een [Vue](https://vuejs.org/) framework.
 
-## 3. Terminal
+## 3. [Terminal](https://github.com/nrdsbvba/MyPacr/tree/main/MyPacr.Terminal)
 Dit is de Point-of-Sale (POS) terminal, deze wordt bediend door een medewerker van de school. Deze geeft dan in wat de klant(aka de student) wilt kopen. Vervolgens scant de student zijn kaart, waardoor de transactie automatisch verloopt.
 
