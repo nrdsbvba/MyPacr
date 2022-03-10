@@ -57,9 +57,9 @@ Pas alle gegevens aan:
 - **smartschoolAuthentication**
 	- Login gegevens om te synchroniseren met smartschool.
 - **reporting**
-	- Wachtwoord om te rapporteren, NIET AANPASSEN. Zie [uitleg](www.link-naar-uitleg.com)
+	- Wachtwoord om te rapporteren. Zie '7. sync en reporting passphrases' onderaan.
 - **syncPassphrases**
-	- Synchronisatie wachtwoorden, NIET AANPASSEN. Zie [uitleg](www.link-naar-uitleg.com)
+	- Synchronisatie wachtwoorden. Zie '7. sync en reporting passphrases' onderaan.
 - **mail**
 	- Mail instellingen, vanwaar, en welk account worden automatische mails verstuurd.
 
@@ -111,8 +111,9 @@ DIRECTUS_API_TOKEN="token"
 Zorg dat PortalAPI en Directus draaien en dat PortalFront niet draait op deze PC.
 Voer het commando `node ./node\_modules/nuxt/bin/nuxt.js` uit om het Terminal project te starten.
 
-Surf naar [`localhost:3000/`](localhost:3000).
-**TODO** registreer een Terminal
+Ga naar de directus webinterface. Klik op de `Terminals` collection, en klik links boven op de plus om een nieuwe terminal te registreren. Vul de nodige velden in en klik op opslaan.
+
+Surf naar `localhost:3000/` en selecteer de nieuw aangemaakte terminal.
 
 ## 5. Omnikey 5427 CK Smart-card readers
 De aangerade smart-card readers zijn de [Omnikey 5427 CK ](https://www.hidglobal.com/products/readers/omnikey/5427).
@@ -138,3 +139,16 @@ Surf naar [Mollie.com](https://www.mollie.com/be) en maak een account aan.
 Er is onmiddelijk een test api key beschikbaar. Om een live api key te krijgen moet je eerst je account verder activeren.
 
 Deze api key kan je invullen in de settings van het PortalAPI project.
+
+## 7. sync en reporting passphrases.
+
+Maak een POST request naar de API endpoints in [syncController](https://github.com/nrdsbvba/MyPacr/blob/main/MyPacr.PortalApi/src/controllers/syncController.js) of naar [reportingController](https://github.com/nrdsbvba/MyPacr/blob/main/MyPacr.PortalApi/src/controllers/reportingController.js). In de body van het request plaats:
+```
+{
+	"passphrase" : "specificPassphrase"
+}
+```
+
+> Let op dat deze requests niet te vaak gebeuren! Te veel requests naar smartschool kan het account blokkeren of de API vertragen.
+
+Het is aangeraden deze requests te maken met een tool zoals [Postman](https://www.postman.com/)
