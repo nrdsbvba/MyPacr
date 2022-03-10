@@ -22,7 +22,7 @@ Andere features die aanwezig zijn:
 Voor meer informatie zie de [wiki](www.link-naar-de-wiki.com).
 
 
-# 1. [PortalAPI](https://github.com/nrdsbvba/MyPacr/tree/main/MyPacr.PortalApi)
+## 1. [PortalAPI](https://github.com/nrdsbvba/MyPacr/tree/main/MyPacr.PortalApi)
 Het portalAPI is de backend API van het systeem dat onder andere de link legt tussen de UI en de databank/CMS. Dit project is een [Node.js](https://nodejs.org) [Express](https://expressjs.com/) server.
 
 ## 2. [PortalFront](https://github.com/nrdsbvba/MyPacr/tree/main/MyPacr.PortalFront)
