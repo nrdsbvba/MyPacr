@@ -1,4 +1,4 @@
-var DirectusSDK = require('@directus/sdk-js')
+import { Directus } from '@directus/sdk'
 var moment = require('moment')
 const Promise = require('bluebird')
 const config = require('config')
@@ -14,13 +14,13 @@ client = {}
 service.setupService = () => {
   const directusSettings = config.get('directusSettings')
   service.settings.url = directusSettings.url
-  client = new DirectusSDK(directusSettings)
+  client = new Directus(directusSettings.url)
 }
 
 service.getGeneralSettings = () => {
   return new Promise((resolve, reject) => {
-    client
-      .getItems('globalsettings', {
+    client.items('globalsettings')
+      .readByQuery({
         fields: '*,default_cardleasing_type.*,default_pricelevel.*',
       })
       .then((resp) => {
@@ -35,8 +35,8 @@ service.getGeneralSettings = () => {
 //#region  Classgroups
 service.getAllClassGroups = (number) => {
   return new Promise((resolve, reject) => {
-    client
-      .getItems('classgroup', {
+    client.items('classgroup')
+      .readByQuery({
         fields: '*',
         limit: -1,
       })
@@ -50,12 +50,12 @@ service.getAllClassGroups = (number) => {
 }
 service.getClassGroupByInternalNumber = (number) => {
   return new Promise((resolve, reject) => {
-    client
-      .getItems('classgroup', {
+    client.items('classgroup')
+      .readByQuery({
         fields: '*',
         filter: {
           internal_number: {
-            eq: number,
+            _eq: number,
           },
         },
       })
@@ -69,12 +69,12 @@ service.getClassGroupByInternalNumber = (number) => {
 }
 service.getClassGroupByCode = (code) => {
   return new Promise((resolve, reject) => {
-    client
-      .getItems('classgroup', {
+    client.items('classgroup')
+      .readByQuery({
         fields: '*',
         filter: {
           code: {
-            eq: code,
+            _eq: code,
           },
         },
       })
@@ -88,8 +88,8 @@ service.getClassGroupByCode = (code) => {
 }
 service.createClassGroup = (classgroup) => {
   return new Promise((resolve, reject) => {
-    client
-      .createItem('classgroup', {
+    client.items('classgroup')
+      .createOne({
         internal_number: classgroup.id,
         code: classgroup.code,
         name: classgroup.name,
@@ -105,8 +105,8 @@ service.createClassGroup = (classgroup) => {
 }
 service.updateClassGroup = (id, classgroup) => {
   return new Promise((resolve, reject) => {
-    client
-      .updateItem('classgroup', id, {
+    client.items('classgroup')
+      .updateOne(id, {
         code: classgroup.code,
         name: classgroup.name,
         description: classgroup.desc,
@@ -124,13 +124,13 @@ service.updateClassGroup = (id, classgroup) => {
 //#region  Users
 service.getUserByInternalNumber = (internalNumber) => {
   return new Promise((resolve, reject) => {
-    client
-      .getItems('users', {
+    client.items('users')
+      .readByQuery({
         fields:
           '*,picture.*,card_leasings.*,card_leasings.card.*,usergroup.*,usergroup.usergroups_id.*',
         filter: {
           internal_number: {
-            eq: internalNumber,
+            _eq: internalNumber,
           },
         },
       })
@@ -144,13 +144,13 @@ service.getUserByInternalNumber = (internalNumber) => {
 }
 service.getUserByUserName = (userName) => {
   return new Promise((resolve, reject) => {
-    client
-      .getItems('users', {
+    client.items('users')
+      .readByQuery({
         fields:
           '*,picture.*,card_leasings.*,card_leasings.card.*,usergroup.*,usergroup.usergroups_id.*',
         filter: {
           smartschool_username: {
-            eq: userName,
+            _eq: userName,
           },
         },
       })
@@ -164,8 +164,8 @@ service.getUserByUserName = (userName) => {
 }
 service.createMinimalUser = (user) => {
   return new Promise((resolve, reject) => {
-    client
-      .createItem('users', {
+    client.items('users')
+      .createOne({
         first_name: user.voornaam,
         last_name: user.naam,
         date_of_birth:
@@ -197,23 +197,23 @@ service.updateUser = (
         user.geboortedatum == '0000-00-00' ? null : user.geboortedatum,
       classgroup: classId
         ? {
-            id: classId,
-          }
+          id: classId,
+        }
         : null,
       internal_number: user.internnummer,
       smartschool_username: user.gebruikersnaam,
       picture: pictureId
         ? {
-            id: pictureId,
-          }
+          id: pictureId,
+        }
         : null,
     }
     if (!uGroupAllreadyLinked) {
       updateObject.usergroup = userGroups
     }
 
-    client
-      .updateItem('users', id, updateObject)
+    client.items('users')
+      .updateOne(id, updateObject)
       .then((resp) => {
         return resolve(resp.data)
       })
@@ -226,8 +226,8 @@ service.updateUser = (
 service.getAllUsers = () => {
   //get all users (minimal, no related objects)
   return new Promise((resolve, reject) => {
-    client
-      .getItems('users', {
+    client.items('users')
+      .readByQuery({
         fields: '*',
         limit: -1,
       })
@@ -244,12 +244,12 @@ service.getAllUsers = () => {
 //#region  Co Accounts
 service.getCoAccountByEmail = (email) => {
   return new Promise((resolve, reject) => {
-    client
-      .getItems('coaccounts', {
+    client.items('coaccounts')
+      .readByQuery({
         fields: '*, users.*',
         filter: {
           email: {
-            eq: email,
+            _eq: email,
           },
         },
       })
@@ -264,12 +264,12 @@ service.getCoAccountByEmail = (email) => {
 
 service.getCoAccountsByEmail = (emails) => {
   return new Promise((resolve, reject) => {
-    client
-      .getItems('coaccounts', {
+    client.items('coaccounts')
+      .readByQuery({
         fields: '*, users.*, allowed_card_leasings.*.*',
         filter: {
           email: {
-            in: emails,
+            _in: emails,
           },
         },
       })
@@ -284,12 +284,12 @@ service.getCoAccountsByEmail = (emails) => {
 
 service.getCoAccountsForUserById = (userId) => {
   return new Promise((resolve, reject) => {
-    client
-      .getItems('coaccounts', {
+    client.items('coaccounts')
+      .readByQuery({
         fields: '*, users.*,users.users_id.*, allowed_card_leasings.*.*',
         filter: {
           'users.users_id.id': {
-            eq: userId,
+            _eq: userId,
           },
         },
       })
@@ -305,8 +305,8 @@ service.getCoAccountsForUserById = (userId) => {
 
 service.getCoAccountById = (id) => {
   return new Promise((resolve, reject) => {
-    client
-      .getItem('coaccounts', id, {
+    client.items('coaccounts')
+      .readOne(id, {
         fields:
           '*.*.*,users.users_id.card_leasings.*.*.*.*.*,users.users_id.*,allowed_card_leasings.*.*',
       })
@@ -320,8 +320,8 @@ service.getCoAccountById = (id) => {
 }
 service.createCoAccount = (coAccount) => {
   return new Promise((resolve, reject) => {
-    client
-      .createItem('coaccounts', {
+    client.items('coaccounts')
+      .createOne({
         email: coAccount.email,
         first_name: coAccount.first_name,
         last_name: coAccount.last_name,
@@ -337,8 +337,8 @@ service.createCoAccount = (coAccount) => {
 }
 service.updateCoAccount = (coAccount, id, userObject) => {
   return new Promise((resolve, reject) => {
-    client
-      .updateItem('coaccounts', id, {
+    client.items('coaccounts')
+      .updateOne(id, {
         email: coAccount.email,
         first_name: coAccount.first_name,
         last_name: coAccount.last_name,
@@ -357,12 +357,12 @@ service.updateCoAccount = (coAccount, id, userObject) => {
 //#region  Cards
 service.getCardByCode = (code) => {
   return new Promise((resolve, reject) => {
-    client
-      .getItems('cards', {
+    client.items('cards')
+      .readByQuery({
         fields: '*',
         filter: {
           code: {
-            eq: code,
+            _eq: code,
           },
         },
       })
@@ -377,8 +377,8 @@ service.getCardByCode = (code) => {
 
 service.linkExisitngCard = (cardId, userId, leasingTypeId, fullDesc) => {
   return new Promise((resolve, reject) => {
-    client
-      .createItem('cardleasings', {
+    client.items('cardleasings')
+      .createOne({
         description: 'Import van oude Data',
         saldo: 0,
         active: true,
@@ -405,13 +405,14 @@ service.linkExisitngCard = (cardId, userId, leasingTypeId, fullDesc) => {
 
 service.linkUnknownCard = (cardCode, userId, leasingTypeId, fullDesc) => {
   return new Promise((resolve, reject) => {
-    client
-      .createItem('cards', {
+    client.items('cards')
+      .createOne({
         code: cardCode,
+
       })
       .then((resp) => {
-        return client
-          .createItem('cardleasings', {
+        return client.items('cardleasings')
+          .createOne({
             description: 'Import van oude Data',
             saldo: 0,
             active: true,
@@ -439,8 +440,8 @@ service.linkUnknownCard = (cardCode, userId, leasingTypeId, fullDesc) => {
 
 service.getAllCardTypes = () => {
   return new Promise((resolve, reject) => {
-    client
-      .getItems('card_leasing_type', {
+    client.items('card_leasing_type')
+      .readByQuery({
         fields: '*',
         limit: -1,
       })
@@ -455,13 +456,13 @@ service.getAllCardTypes = () => {
 
 service.getAllCardLeasesByUserId = (id) => {
   return new Promise((resolve, reject) => {
-    client
-      .getItems('cardleasings', {
+    client.items('cardleasings')
+      .readByQuery({
         fields:
           '*,user.*, card.*,,transactions.*, transactions.order.order_items.*.*,card_leasing_type.*',
         filter: {
           'user.id': {
-            eq: id,
+            _eq: id,
           },
         },
       })
@@ -476,8 +477,8 @@ service.getAllCardLeasesByUserId = (id) => {
 
 service.getAllCardLeases = () => {
   return new Promise((resolve, reject) => {
-    client
-      .getItems('cardleasings', {
+    client.items('cardleasings')
+      .readByQuery({
         fields:
           '*,user.*, card.*,transactions.*, transactions.order.order_items.*.*,card_leasing_type.*',
         limit: -1,
@@ -493,13 +494,13 @@ service.getAllCardLeases = () => {
 
 service.getCardLeasingsUnderTreshold = (treshold) => {
   return new Promise((resolve, reject) => {
-    client
-      .getItems('cardleasings', {
+    client.items('cardleasings')
+      .readByQuery({
         fields: '*,user.*, card.*,card_leasing_type.*',
         limit: -1,
         filter: {
           saldo: {
-            lte: treshold,
+            _lte: treshold,
           },
         },
       })
@@ -514,12 +515,14 @@ service.getCardLeasingsUnderTreshold = (treshold) => {
 
 service.doCardMerge = (oldCardLeasingId, newCardLeasingId, newSaldo) => {
   return new Promise((resolve, reject) => {
-    client
-      .getItems('transactions', {
+    client.items('transactions')
+      .readByQuery({
         fields: '*, cardleasing.*',
         filter: {
-          'cardleasing.id': {
-            eq: oldCardLeasingId,
+          cardleasing: {
+            id: {
+              _eq: oldCardLeasingId,
+            }
           },
         },
         limit: -1,
@@ -529,13 +532,14 @@ service.doCardMerge = (oldCardLeasingId, newCardLeasingId, newSaldo) => {
         resp.data.forEach((element) => {
           transRay.push({
             id: element.id,
-            cardleasing: {
-              id: newCardLeasingId,
-            },
           })
         })
         if (transRay.length > 0) {
-          return client.updateItems('transactions', transRay)
+          return client.items('transactions').updateMany(transRay, {
+            cardleasing: {
+              id: newCardLeasingId,
+            },
+          });
         } else {
           return {
             data: null,
@@ -543,12 +547,12 @@ service.doCardMerge = (oldCardLeasingId, newCardLeasingId, newSaldo) => {
         }
       })
       .then((resp) => {
-        return client.updateItem('cardleasings', newCardLeasingId, {
-          saldo: newSaldo,
+        return client.items('cardleasings').updateOne(newCardLeasingId, {
+          saldo: newSaldo
         })
       })
       .then((resp) => {
-        return client.deleteItem('cardleasings', oldCardLeasingId)
+        return client.items('cardleasings').deleteOne(oldCardLeasingId);
       })
       .then((resp) => {
         return resolve(resp.data)
@@ -561,12 +565,12 @@ service.doCardMerge = (oldCardLeasingId, newCardLeasingId, newSaldo) => {
 
 service.hardDeleteCardLeasing = (oldId, newId, newSaldo) => {
   return new Promise((resolve, rejec) => {
-    client
-      .updateItem('cardleasings', newId, {
+    client.items('cardleasings')
+      .updateOne(newId, {
         saldo: newSaldo,
       })
       .then((resp) => {
-        return client.deleteItem('cardleasings', id)
+        return client.items('cardleasings').deleteOne(id)
       })
       .then((resp) => {
         return resolve(resp.data)
@@ -579,8 +583,8 @@ service.hardDeleteCardLeasing = (oldId, newId, newSaldo) => {
 
 service.updateSaldo = (id, saldo) => {
   return new Promise((resolve, reject) => {
-    client
-      .updateItem('cardleasings', id, {
+    client.items('cardleasings')
+      .updateOne(id, {
         saldo: saldo,
       })
       .then((resp) => {
@@ -595,8 +599,8 @@ service.updateSaldo = (id, saldo) => {
 
 service.updateFullDescription = (id, fullDescription) => {
   return new Promise((resolve, reject) => {
-    client
-      .updateItem('cardleasings', id, {
+    client.items('cardleasings')
+      .updateOne(id, {
         full_description: fullDescription,
       })
       .then((resp) => {
@@ -612,9 +616,9 @@ service.updateFullDescription = (id, fullDescription) => {
 //#region  files
 service.updateImage = (id, pictureObject) => {
   return new Promise((resolve, reject) => {
-    client
-      .patch(service.settings.url + '/_/files/' + id, {
-        data: pictureObject.data,
+    client.files
+      .updateOne(id, {
+        data: pictureObject
       })
       .then((resp) => {
         return resolve(resp.data)
@@ -627,8 +631,10 @@ service.updateImage = (id, pictureObject) => {
 
 service.createImage = (pictureObject) => {
   return new Promise((resolve, reject) => {
-    client
-      .post(service.settings.url + '/_/files', pictureObject)
+    client.files
+      .createOne({
+        pictureObject
+      })
       .then((resp) => {
         return resolve(resp.data)
       })
@@ -642,8 +648,10 @@ service.createImage = (pictureObject) => {
 //#region usergroups
 service.getUserGroups = () => {
   return new Promise((resolve, reject) => {
-    client
-      .getItems('usergroups')
+    client.items('usergroups')
+      .readByQuery({
+        limit: -1,
+      })
       .then((resp) => {
         return resolve(resp.data)
       })
@@ -658,8 +666,8 @@ service.getUserGroups = () => {
 
 service.createOnlinePayment = (payload) => {
   return new Promise((resolve, reject) => {
-    client
-      .createItem('online_payment', {
+    client.items('online_payment')
+      .createOne({
         coaccount: {
           id: payload.coaccount_id,
         },
@@ -682,8 +690,8 @@ service.createOnlinePayment = (payload) => {
 
 service.getOnlinePaymentById = (id) => {
   return new Promise((resolve, reject) => {
-    client
-      .getItem('online_payment', id, {
+    client.items('online_payment')
+      .readOne(id, {
         fields: '*.*.*.*',
       })
       .then((resp) => {
@@ -698,8 +706,8 @@ service.getOnlinePaymentById = (id) => {
 
 service.completeOnlinePayment = (id, refunded) => {
   return new Promise((resolve, reject) => {
-    client
-      .updateItem('online_payment', id, {
+    client.items('online_payment')
+      .updateOne(id, {
         completed: true,
         handling_fee_refunded: refunded,
       })
@@ -715,8 +723,8 @@ service.completeOnlinePayment = (id, refunded) => {
 
 service.completeOnlineTopOff = (id) => {
   return new Promise((resolve, reject) => {
-    client
-      .updateItem('online_topoff', id, {
+    client.items('online_topoff')
+      .updateOne(id, {
         completed: true,
       })
       .then((resp) => {
@@ -735,8 +743,8 @@ service.completeOnlineTopOff = (id) => {
 
 service.createTransaction = (object) => {
   return new Promise((resolve, reject) => {
-    client
-      .createItem('transactions', object)
+    client.items('transactions')
+      .createOne(object)
       .then((resp) => {
         return resolve(resp.data)
       })
@@ -747,12 +755,12 @@ service.createTransaction = (object) => {
   })
 }
 
-//#enregion
+//#endregion
 
 service.getAllOrderItems = () => {
   return new Promise((resolve, reject) => {
-    client
-      .getItems('orderitems', {
+    client.items('orderitems')
+      .readByQuery({
         limit: -1,
         fields: '*',
       })
@@ -772,13 +780,13 @@ service.getOrderByDate = (datetime) => {
       .subtract(1, 'seconds')
       .format('YYYY-MM-DD HH:mm:ss')
     let until = moment(datetime).add(0, 'seconds').format('YYYY-MM-DD HH:mm:ss')
-    client
-      .getItems('orders', {
+    client.items('orders')
+      .readByQuery({
         fields: '*, transactions.*',
         limit: -1,
         filter: {
           created_on: {
-            between: [from, until],
+            _between: [from, until],
           },
         },
       })
@@ -794,8 +802,8 @@ service.getOrderByDate = (datetime) => {
 
 service.fixOrderItem = (orderItemId, orderId) => {
   return new Promise((resolve, reject) => {
-    client
-      .updateItem('orderitems', orderItemId, {
+    client.items('orderitems')
+      .updateOne(orderItemId, {
         order: {
           id: orderId,
         },
@@ -812,8 +820,8 @@ service.fixOrderItem = (orderItemId, orderId) => {
 
 service.deleteTransactions = (idRay) => {
   return new Promise((resolve, reject) => {
-    client
-      .deleteItems('transactions', idRay)
+    client.items('transactions')
+      .deleteMany(idRay)
       .then((resp) => {
         return resolve(resp)
       })
@@ -826,8 +834,8 @@ service.deleteTransactions = (idRay) => {
 
 service.createTransactions = (transRay) => {
   return new Promise((resolve, reject) => {
-    client
-      .createItems('transactions', transRay)
+    client.items('transactions')
+      .createMany(transRay)
       .then((resp) => {
         return resolve(resp)
       })
@@ -840,12 +848,14 @@ service.createTransactions = (transRay) => {
 
 service.getAttendenceProfiles = (userIds) => {
   return new Promise((resolve, reject) => {
-    client
-      .getItems('attendenceprofile', {
+    client.items('attendenceprofile')
+      .readByQuery({
         fields: '*.*',
         filter: {
-          'user.id': {
-            in: userIds,
+          user: {
+            id: {
+              _in: userIds,
+            }
           },
         },
       })
@@ -861,8 +871,8 @@ service.getAttendenceProfiles = (userIds) => {
 
 service.getAllAttendenceProfiles = () => {
   return new Promise((resolve, reject) => {
-    client
-      .getItems('attendenceprofile', {
+    client.items('attendenceprofile')
+      .readByQuery({
         fields: '*.*',
         limit: -1,
       })
@@ -879,12 +889,10 @@ service.getAllAttendenceProfiles = () => {
 service.saveAttendenceProfile = (attendenceProfile) => {
   if (attendenceProfile.id != null && attendenceProfile.id > 0) {
     return new Promise((resolve, reject) => {
-      client
-        .updateItem(
-          'attendenceprofile',
-          attendenceProfile.id,
-          attendenceProfile
-        )
+      client.items('attendenceprofile')
+        .updateOne(attendenceProfile.id, {
+          attendenceProfile,
+        })
         .then((resp) => {
           return resolve(resp.data)
         })
@@ -895,8 +903,8 @@ service.saveAttendenceProfile = (attendenceProfile) => {
     })
   } else {
     return new Promise((resolve, reject) => {
-      client
-        .createItem('attendenceprofile', attendenceProfile)
+      client.items('attendenceprofile')
+        .createOne(attendenceProfile)
         .then((resp) => {
           return resolve(resp.data)
         })
@@ -916,15 +924,17 @@ service.getPagedTransactions = (limit, pageNumber, cardLeasingId) => {
       paramObject.offset = (pageNumber - 1) * limit
     }
     paramObject.filter = {
-      'cardleasing.id': {
-        eq: cardLeasingId,
+      cardleasing: {
+        id: {
+          _eq: cardLeasingId,
+        }
       },
     }
     paramObject.fields = '*,order.*.*.*'
     paramObject.sort = 'time_of_transaction'
 
-    client
-      .getItems('transactions', paramObject)
+    client.items('transactions')
+      .readByQuery(paramObject)
       .then((resp) => {
         return resolve(resp.data)
       })
@@ -934,19 +944,22 @@ service.getPagedTransactions = (limit, pageNumber, cardLeasingId) => {
       })
   })
 }
+
 service.getTransactionsCount = (cardLeasingId) => {
   return new Promise((resolve, reject) => {
     var paramObject = {}
     paramObject.filter = {
-      'cardleasing.id': {
-        eq: cardLeasingId,
+      cardleasing: {
+        id: {
+          _eq: cardLeasingId,
+        }
       },
     }
     paramObject.fields = '*'
     paramObject.sort = 'time_of_transaction'
 
-    client
-      .getItems('transactions', paramObject)
+    client.items('transactions')
+      .readByQuery(paramObject)
       .then((resp) => {
         return resolve(resp.data.length)
       })
@@ -963,15 +976,15 @@ service.getAttendenceExceptionsForCurrentDay = (currentDate) => {
     paramObject.fields = '*'
     paramObject.filter = {
       from: {
-        lte: currentDate,
+        _lte: currentDate,
       },
       till: {
-        gte: currentDate,
+        _gte: currentDate,
       },
     }
 
-    client
-      .getItems('attendence_exceptions', paramObject)
+    client.items('attendence_exceptions')
+      .readByQuery(paramObject)
       .then((resp) => {
         return resolve(resp.data)
       })
@@ -984,15 +997,15 @@ service.getAttendenceExceptionsForCurrentDay = (currentDate) => {
 
 service.getAttendencesForUserByDate = (userId, currentDate) => {
   return new Promise((resolve, reject) => {
-    client
-      .getItems('attendences', {
+    client.items('attendences')
+      .readByQuery({
         fields: '*',
         filter: {
           user: {
-            eq: userId,
+            _eq: userId,
           },
           date: {
-            eq: currentDate,
+            _eq: currentDate,
           },
         },
       })
@@ -1008,8 +1021,8 @@ service.getAttendencesForUserByDate = (userId, currentDate) => {
 
 service.saveAbsence = (absence) => {
   return new Promise((resolve, reject) => {
-    client
-      .createItem('absences', absence)
+    client.items('absences')
+      .createOne(absence)
       .then((resp) => {
         return resolve(resp.data)
       })
@@ -1022,15 +1035,15 @@ service.saveAbsence = (absence) => {
 
 service.getAbsencesForUserByDate = (userId, currentDate) => {
   return new Promise((resolve, reject) => {
-    client
-      .getItems('absences', {
+    client.items('absences')
+      .readByQuery({
         fields: '*',
         filter: {
           user: {
-            eq: userId,
+            _eq: userId,
           },
           date_of_absence: {
-            eq: currentDate,
+            _eq: currentDate,
           },
         },
       })
@@ -1046,8 +1059,10 @@ service.getAbsencesForUserByDate = (userId, currentDate) => {
 
 service.getAllControles = () => {
   return new Promise((resolve, reject) => {
-    client
-      .getItems('controles')
+    client.items('controles')
+      .readByQuery({
+        limit: -1
+      })
       .then((resp) => {
         return resolve(resp.data)
       })
@@ -1064,15 +1079,15 @@ service.getControleExceptionsForCurrentDay = (currentDate) => {
     paramObject.fields = '*'
     paramObject.filter = {
       from: {
-        lte: currentDate,
+        _lte: currentDate,
       },
       till: {
-        gte: currentDate,
+        _gte: currentDate,
       },
     }
 
-    client
-      .getItems('controle_exceptions', paramObject)
+    client.items('controle_exceptions')
+      .readByQuery(paramObject)
       .then((resp) => {
         return resolve(resp.data)
       })
@@ -1085,13 +1100,13 @@ service.getControleExceptionsForCurrentDay = (currentDate) => {
 
 service.getReportByKey = (key) => {
   return new Promise((resolve, reject) => {
-    client
-      .getItems('reports', {
+    client.items('reports')
+      .readByQuery({
         single: true,
         fields: '*',
         filter: {
           key: {
-            eq: key,
+            _eq: key,
           },
         },
       })
@@ -1108,8 +1123,8 @@ service.getReportByKey = (key) => {
 
 service.getConfigurations = () => {
   return new Promise((resolve, reject) => {
-    client
-      .getItems('z_configurations', {
+    client.items('z_configurations')
+      .readByQuery({
         fields: '*',
       })
       .then((resp) => {

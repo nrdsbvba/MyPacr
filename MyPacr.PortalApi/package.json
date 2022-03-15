@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "@diekeure/passport-smartschool": "0.1.0",
-    "@directus/sdk-js": "5.3.4",
+    "@directus/sdk": "^9.6.0",
     "@mollie/api-client": "3.0.0-beta.1",
     "argon2": "^0.24.1",
     "axios": "^0.19.0",
