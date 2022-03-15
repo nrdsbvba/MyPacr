@@ -77,6 +77,7 @@ export default {
   computed: {
     cookieExperationDate: {
       get() {
+        console.log(this.$store.state)
         if (this.$store.state.globalSettings) {
           return moment(
             this.$store.state.globalSettings.cookie_expiration

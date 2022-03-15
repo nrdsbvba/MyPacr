@@ -109,7 +109,7 @@ export default {
   methods: {
     setProfileButton: function() {
       var fileName = this.$store.state.loggedInInfo.avatar
-        ? this.$store.state.loggedInInfo.avatar.filename_download
+        ? this.$store.state.loggedInInfo.avatar.filename_disk
         : ''
 
       this.avatarLink = tobackend.getThumbnail(fileName, 60, 60)

@@ -10,7 +10,7 @@
               header="RegistratieSysteem"
               header-bg-variant="primary"
               header-text-variant="white"
-              style="min-height: 20rem;"
+              style="min-height: 20rem"
             >
               <div class="text-center" v-if="spinner">
                 <b-spinner
@@ -40,35 +40,35 @@
                       /></b-col>
 
                       <b-col>
-                        <h4 class=" m-3 align-top">Saldo:</h4>
-                        <div><span class=" m-3 align-top">Klas: </span></div>
-                        <div><span class=" m-3 align-top">Campus: </span></div>
-                        <div><span class=" m-3 align-top">Groep: </span></div>
+                        <h4 class="m-3 align-top">Saldo:</h4>
+                        <div><span class="m-3 align-top">Klas: </span></div>
+                        <div><span class="m-3 align-top">Campus: </span></div>
+                        <div><span class="m-3 align-top">Groep: </span></div>
                       </b-col>
                       <b-col
                         ><h4
-                          class=" m-3 align-top"
+                          class="m-3 align-top"
                           :class="{
                             'text-danger':
                               parseFloat(currentParticipant.saldo) <= 0,
                             'text-success':
-                              parseFloat(currentParticipant.saldo) < 0
+                              parseFloat(currentParticipant.saldo) < 0,
                           }"
                         >
                           {{
                             '€ ' +
-                              parseFloat(currentParticipant.saldo).toFixed(2)
+                            parseFloat(currentParticipant.saldo).toFixed(2)
                           }}
                         </h4>
                         <div>
-                          <span class=" m-3 align-top">{{
+                          <span class="m-3 align-top">{{
                             currentParticipant.user.classgroup
-                              ? currentCustomer.user.classgroup.name
+                              ? currentParticipant.user.classgroup.name
                               : ''
                           }}</span>
                         </div>
                         <div>
-                          <span class=" m-3 align-top"
+                          <span class="m-3 align-top"
                             >{{
                               currentParticipant.user.campus
                                 ? currentParticipant.user.campus.short_name
@@ -77,7 +77,7 @@
                           </span>
                         </div>
                         <div>
-                          <span class=" m-3 align-top"
+                          <span class="m-3 align-top"
                             >{{
                               usergroupArrayToString(
                                 currentParticipant.user.usergroup
@@ -103,7 +103,10 @@
                           v-model="currentSelectedEvent"
                           :options="knownEvents"
                           class="btn-rounded-left btn-rounded-right text-center"
-                          style="padding:0 0 0 0 !important; padding-left:10px !important"
+                          style="
+                            padding: 0 0 0 0 !important;
+                            padding-left: 10px !important;
+                          "
                           size="lg"
                         ></b-form-select>
                       </b-col>
@@ -189,24 +192,25 @@ export default {
       input: null,
       options: {
         useKbEvents: false,
-        preventClickEvent: true
+        preventClickEvent: true,
       },
       lastText: '',
       styleObject: {
-        defaultInput: 'btn-rounded-left btn-rounded-right text-center'
+        defaultInput: 'btn-rounded-left btn-rounded-right text-center',
       },
-      selectedEvent: null
+      selectedEvent: null,
     }
   },
   computed: {
     currentParticipant: {
       get() {
         var tmp = this.$store.state.currentParticipant
+        console.log(tmp)
         return tmp
       },
       set() {
         //
-      }
+      },
     },
     currentSelectedEvent: {
       get() {
@@ -215,7 +219,8 @@ export default {
       },
       set(theEvent) {
         this.$store.commit('setCurrentSelectedEvent', theEvent)
-      }
+        console.log(theEvent)
+      },
     },
     eventLocked: {
       get() {
@@ -224,16 +229,18 @@ export default {
       },
       set() {
         //
-      }
+      },
     },
     knownEvents: {
       get() {
         var returnRay = [{ value: null, text: 'Kies een Event' }]
+        console.log('here')
         if (this.$store.state.registeredEvents) {
           this.$store.state.registeredEvents.forEach((element) => {
+            console.log(element)
             returnRay.push({
               value: element,
-              text: element.name
+              text: element.name,
             })
           })
           return returnRay
@@ -241,10 +248,10 @@ export default {
           return returnRay
         }
       },
-      set() {}
-    }
+      set() {},
+    },
   },
-  beforeMount: function() {
+  beforeMount: function () {
     if (tobackend.isLoggedIn(this.$store)) {
       if (!this.$store.state.userGroups) {
         tobackend.getUserGroups(this.$store).then(() => {
@@ -266,14 +273,14 @@ export default {
           })
     }
   },
-  created: function() {
+  created: function () {
     window.addEventListener('keydown', this.scanEvent)
   },
-  destroyed: function() {
+  destroyed: function () {
     window.removeEventListener('keydown', this.scanEvent)
   },
   methods: {
-    scanEvent: function(event) {
+    scanEvent: function (event) {
       if (!this.$store.state.currentlyTyping) {
         if (!this.isScanning) {
           this.initiateScan()
@@ -281,7 +288,7 @@ export default {
         this.currentCharSeq += event.key
       }
     },
-    initiateScan: function() {
+    initiateScan: function () {
       this.isScanning = true
       setTimeout(() => {
         //convert char sequence
@@ -314,12 +321,13 @@ export default {
         this.currentCharSeq = ''
       }, this.msAfterScans)
     },
-    getUserByCard: function(cardId) {
+    getUserByCard: function (cardId) {
       tobackend
         .getUserCardByCardId(this.$store, cardId, true, 'setCurrentParticipant')
         .then((resp) => {
           if (!resp) {
             this.spinner = false
+            console.log(this.currentParticipant)
             this.$bvToast.toast(
               'Kan gebruiker: ' +
                 this.currentParticipant.user.first_name +
@@ -331,7 +339,7 @@ export default {
                 title: 'Registratie',
                 variant: 'danger',
                 autoHideDelay: 5000,
-                appenToast: false
+                appenToast: false,
               }
             )
           } else {
@@ -350,7 +358,7 @@ export default {
               title: 'Registratie',
               variant: 'success',
               autoHideDelay: 5000,
-              appenToast: false
+              appenToast: false,
             }
           )
         })
@@ -362,11 +370,11 @@ export default {
             title: 'Registratie',
             variant: 'danger',
             autoHideDelay: 5000,
-            appenToast: false
+            appenToast: false,
           })
         })
     },
-    createArticleThumbnail: function(filename) {
+    createArticleThumbnail: function (filename) {
       if (!filename) {
         return ''
       } else {
@@ -378,12 +386,12 @@ export default {
         )
       }
     },
-    getUserGroups: function(userGroupsArray) {
+    getUserGroups: function (userGroupsArray) {
       console.log('Entered usergroupFormat Function')
       console.log(this.$store.state.userGroups)
       console.log(userGroupsArray)
     },
-    usergroupArrayToString: function(userGroupsArray) {
+    usergroupArrayToString: function (userGroupsArray) {
       var returnString = ''
 
       userGroupsArray.forEach((element) => {
@@ -396,13 +404,13 @@ export default {
       })
       return returnString
     },
-    clearCurrentUser: function() {
+    clearCurrentUser: function () {
       this.$store.commit('setCurrentParticipant', null)
     },
-    getCards: function(query) {
+    getCards: function (query) {
       return tobackend.getCardSuggestionsBySearchKey(query)
     },
-    getFullCardUser: function(item) {
+    getFullCardUser: function (item) {
       if (item != null) {
         this.getUserByCard(item.card.code)
       }
@@ -419,13 +427,13 @@ export default {
     hide() {
       this.visible = false
     },
-    UnlockEvent: function() {
+    UnlockEvent: function () {
       this.currentSelectedEvent = null
-    }
+    },
   },
   components: {
-    VueSimpleSuggest
-  }
+    VueSimpleSuggest,
+  },
 }
 </script>
 

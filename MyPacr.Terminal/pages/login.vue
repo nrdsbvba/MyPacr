@@ -112,7 +112,7 @@ export default {
           })
           setTimeout(() => {
             this.$router.push('/kassa')
-          }, 1000)
+          }, 10)
         })
         .catch((result) => {
           console.log(result)

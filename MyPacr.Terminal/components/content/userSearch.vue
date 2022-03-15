@@ -155,6 +155,7 @@ export default {
       this.$store.commit('setCurrentlyTyping', typing)
     },
     clearCurrentUser: function() {
+      console.log("clearing")
       this.$store.commit('setCurrentCustomerForLink', null)
     },
     usergroupArrayToString: function(userGroupsArray) {
@@ -187,6 +188,7 @@ export default {
     getFullcustomer(item) {
       if (item != null) {
         this.customerSearch = ''
+        console.log(item);
         tobackend.getUserByIdForLink(this.$store, item.id).then(() => {
           //wait for completion
         })
