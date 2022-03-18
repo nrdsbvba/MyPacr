@@ -26,7 +26,7 @@ serverConfigurator
     return directusService.getGeneralSettings();
   })
   .then(resp => {
-    global.generalSettings = resp[0];
+    global.generalSettings = resp;
 
     console.log("*** Logging generalSettings ***");
     console.log(JSON.stringify(global.generalSettings));

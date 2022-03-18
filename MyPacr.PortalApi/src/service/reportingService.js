@@ -37,13 +37,13 @@ var generateReport = payload => {
     directusService
       .getReportByKey(reportKey)
       .then(resp => {
-        if (resp) {
-          reportInfo = resp;
-          query = resp.query;
-
+        if (resp[0]) {
+          reportInfo = resp[0];
+          query = resp[0].query;
+          console.log(resp)
           if (parameters && parameters.length > 0) {
             //merge sql with given parameters
-            var queryRay = query.split(resp.parameterchars);
+            var queryRay = query.split(resp[0].parameterchars);
             queryRay.forEach((element, index, ray) => {
               parameters.forEach((innerElement, innerIndex, innerRay) => {
                 tmpValue = innerElement.value;

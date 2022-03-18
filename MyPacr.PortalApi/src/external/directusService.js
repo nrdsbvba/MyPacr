@@ -1,4 +1,4 @@
-import { Directus } from '@directus/sdk'
+var Directus = require('@directus/sdk')
 var moment = require('moment')
 const Promise = require('bluebird')
 const config = require('config')
@@ -14,7 +14,8 @@ client = {}
 service.setupService = () => {
   const directusSettings = config.get('directusSettings')
   service.settings.url = directusSettings.url
-  client = new Directus(directusSettings.url)
+  client = new Directus.Directus(directusSettings.url)
+  return client.auth.static(directusSettings.token)
 }
 
 service.getGeneralSettings = () => {
@@ -96,7 +97,7 @@ service.createClassGroup = (classgroup) => {
         description: classgroup.desc,
       })
       .then((resp) => {
-        return resolve(resp.data)
+        return resolve(resp)
       })
       .catch((err) => {
         return reject(err)
@@ -174,7 +175,7 @@ service.createMinimalUser = (user) => {
         smartschool_username: user.gebruikersnaam,
       })
       .then((resp) => {
-        return resolve(resp.data)
+        return resolve(resp)
       })
       .catch((err) => {
         return reject(err)
@@ -311,7 +312,7 @@ service.getCoAccountById = (id) => {
           '*.*.*,users.users_id.card_leasings.*.*.*.*.*,users.users_id.*,allowed_card_leasings.*.*',
       })
       .then((resp) => {
-        return resolve(resp.data)
+        return resolve(resp)
       })
       .catch((err) => {
         return reject(err)
@@ -328,7 +329,7 @@ service.createCoAccount = (coAccount) => {
         password: coAccount.password,
       })
       .then((resp) => {
-        return resolve(resp.data)
+        return resolve(resp)
       })
       .catch((err) => {
         return reject(err)
@@ -395,7 +396,7 @@ service.linkExisitngCard = (cardId, userId, leasingTypeId, fullDesc) => {
         full_description: fullDesc,
       })
       .then((resp) => {
-        return resolve(resp.data)
+        return resolve(resp)
       })
       .catch((err) => {
         return reject(err)
@@ -421,7 +422,7 @@ service.linkUnknownCard = (cardCode, userId, leasingTypeId, fullDesc) => {
               id: userId,
             },
             card: {
-              id: resp.data.id,
+              id: resp.id,
             },
             card_leasing_type: {
               id: leasingTypeId,
@@ -429,7 +430,7 @@ service.linkUnknownCard = (cardCode, userId, leasingTypeId, fullDesc) => {
             full_description: fullDesc,
           })
           .then((resp) => {
-            return resolve(resp.data)
+            return resolve(resp)
           })
           .catch((err) => {
             return reject(err)
@@ -588,7 +589,6 @@ service.updateSaldo = (id, saldo) => {
         saldo: saldo,
       })
       .then((resp) => {
-        // console.log(resp)
         return resolve(resp)
       })
       .catch((err) => {
@@ -636,7 +636,7 @@ service.createImage = (pictureObject) => {
         pictureObject
       })
       .then((resp) => {
-        return resolve(resp.data)
+        return resolve(resp)
       })
       .catch((err) => {
         console.log(err)
@@ -666,6 +666,7 @@ service.getUserGroups = () => {
 
 service.createOnlinePayment = (payload) => {
   return new Promise((resolve, reject) => {
+    console.log(payload);
     client.items('online_payment')
       .createOne({
         coaccount: {
@@ -679,7 +680,7 @@ service.createOnlinePayment = (payload) => {
         time_of_payment_localized: payload.time_of_payment_localized,
       })
       .then((resp) => {
-        return resolve(resp.data)
+        return resolve(resp)
       })
       .catch((err) => {
         console.log(err)
@@ -695,7 +696,7 @@ service.getOnlinePaymentById = (id) => {
         fields: '*.*.*.*',
       })
       .then((resp) => {
-        return resolve(resp.data)
+        return resolve(resp)
       })
       .catch((err) => {
         console.log(err)
@@ -712,7 +713,7 @@ service.completeOnlinePayment = (id, refunded) => {
         handling_fee_refunded: refunded,
       })
       .then((resp) => {
-        return resolve(resp.data)
+        return resolve(resp)
       })
       .catch((err) => {
         console.log(err)
@@ -728,7 +729,7 @@ service.completeOnlineTopOff = (id) => {
         completed: true,
       })
       .then((resp) => {
-        return resolve(resp.data)
+        return resolve(resp)
       })
       .catch((err) => {
         console.log(err)
@@ -746,7 +747,7 @@ service.createTransaction = (object) => {
     client.items('transactions')
       .createOne(object)
       .then((resp) => {
-        return resolve(resp.data)
+        return resolve(resp)
       })
       .catch((err) => {
         console.log(err)
@@ -906,7 +907,7 @@ service.saveAttendenceProfile = (attendenceProfile) => {
       client.items('attendenceprofile')
         .createOne(attendenceProfile)
         .then((resp) => {
-          return resolve(resp.data)
+          return resolve(resp)
         })
         .catch((err) => {
           console.log(err)
@@ -1024,7 +1025,7 @@ service.saveAbsence = (absence) => {
     client.items('absences')
       .createOne(absence)
       .then((resp) => {
-        return resolve(resp.data)
+        return resolve(resp)
       })
       .catch((err) => {
         console.log(err)

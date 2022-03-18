@@ -3,16 +3,16 @@ const environmentConfig = require("./environmentConfig");
 const developmentEnvironmentConfig = {
   environment: "development",
   directusSettings: {
-    token: "abcd",
-    url: "http://localhost:80"
+    token: "4E29pMC5ZdHpW0TmhJubySEs",
+    url: "http://localhost:8055"
   },
   portalSettings: {
     fileLink: "http://localhost:80",
     apiUrl: "http://localhost:80/api",
     tokenSettings: {
       passphrase:
-        "ABC123HIJ",
-      key: "JWTSecret!"
+        "daytona0overture96singular68Easing42gape51rusting17nereid86foliate34Flattest43fissile98Pravda76Meek",
+      key: "NinaPeeters2019!"
     }
   }
 };
