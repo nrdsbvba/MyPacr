@@ -42,6 +42,8 @@ service.configServices = () => {
         .catch(err => {
           return reject(err);
         });
+    }).catch(err => {
+      return reject(err);
     });
   });
 };

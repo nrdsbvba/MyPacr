@@ -176,6 +176,7 @@ service.getAuthProviderSettings = (store) => {
         service.url + '/user/authProviderSettings'
       )
       .then(resp => {
+        console.log(resp);
         return resolve(resp.data)
       })
       .catch(err => {

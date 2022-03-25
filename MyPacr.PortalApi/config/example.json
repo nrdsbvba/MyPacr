@@ -1,6 +1,6 @@
 {
   "directusSettings": {
-    "url": "https://localhost:8055",
+    "url": "http://localhost:8055",
     "projectUrl": "_",
     "token": "your_token",
     "databaseSettings": {

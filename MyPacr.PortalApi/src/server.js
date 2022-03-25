@@ -53,6 +53,9 @@ serverConfigurator
     console.log("Setup went wrong!");
     console.log(JSON.stringify(config));
     console.log(err);
+    // EXIT THE PROGRAM
+    // No use to keep running if setup went wrong.
+    process.exit(1)
   });
 
 const app = express();
@@ -100,5 +103,5 @@ app.use("/api/payment", require("./controllers/paymentController"));
 app.use("/api/reports", require("./controllers/reportingController"));
 
 app.listen(port, () => {
-  console.log("Server started at port " + port);
+  console.log("Server started at the following port " + port);
 });

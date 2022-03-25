@@ -32,9 +32,9 @@
     "vue": "^2.6.12",
     "vue-bootstrap-typeahead": "0.2.6",
     "vue-cookie": "1.1.4",
-    "vue-server-renderer": "2.6.12",
+    "vue-server-renderer": "^2.6.12",
     "vue-simple-suggest": "1.9.5",
-    "vue-template-compiler": "2.6.12",
+    "vue-template-compiler": "^2.6.12",
     "vue-touch-keyboard": "0.3.2"
   },
   "devDependencies": {

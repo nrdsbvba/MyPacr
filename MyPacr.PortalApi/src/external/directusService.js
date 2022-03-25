@@ -2,6 +2,7 @@ var Directus = require('@directus/sdk')
 var moment = require('moment')
 const Promise = require('bluebird')
 const config = require('config')
+const { max } = require('lodash')
 
 service = {
   settings: {
@@ -15,7 +16,7 @@ service.setupService = () => {
   const directusSettings = config.get('directusSettings')
   service.settings.url = directusSettings.url
   client = new Directus.Directus(directusSettings.url)
-  return client.auth.static(directusSettings.token)
+  return client.auth.static(directusSettings.token);
 }
 
 service.getGeneralSettings = () => {
@@ -25,6 +26,8 @@ service.getGeneralSettings = () => {
         fields: '*,default_cardleasing_type.*,default_pricelevel.*',
       })
       .then((resp) => {
+        console.log("Received general settings")
+        console.log(resp)
         return resolve(resp.data)
       })
       .catch((err) => {
@@ -1130,6 +1133,7 @@ service.getConfigurations = () => {
       })
       .then((resp) => {
         console.log('Retrieved Directus configurations')
+        console.log(resp)
         return resolve(resp.data)
       })
       .catch((err) => {
