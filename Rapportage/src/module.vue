@@ -1,252 +1,149 @@
 <template>
-  <private-view title="My Test Module">
-    <div>
-      <div class="row">
-        <div class="col-12">
-          <div class="card border-primary m-2">
-            <div class="card-header text-center primary">RapportKeuze</div>
-            <div class="card-body">
-              <div class="form-group">
-                <label>Type Rapport</label>
-                <select class="form-control" v-model="selectedReport">
-                  <option
-                    v-for="item in reportOptions"
-                    v-bind:key="item.value.key"
-                    :value="item.value"
-                  >
-                    {{ item.text }}
-                  </option>
-                </select>
-              </div>
-
-              <div class="form-group">
-                <label>Format</label>
-                <select class="form-control" v-model="selectedOutput">
-                  <option value="pdf">pdf</option>
-                  <option value="excel">excel</option>
-                  <option value="data">in scherm</option>
-                </select>
-              </div>
-              <div v-if="generatingReport">
-                <div class="spinner-border" role="status">
-                  <!--<span class="visually-hidden">Loading...</span> -->
-                </div>
-              </div>
-
-              <div
-                v-if="
-                  selectedReportComputed &&
-                  selectedReportComputed.parameterobject &&
-                  selectedReportComputed.parameterobject.length > 0
-                "
-              >
-                <hr />
-                <div v-if="gettingData">
-                  <div class="spinner-border" role="status"></div>
-                </div>
-                <div v-else>
-                  <div
-                    class="form-group"
-                    v-for="item in selectedReportComputed.parameterobject"
-                    :key="item.name"
-                  >
-                    <label>{{ item.name }}</label>
-                    <div v-if="item.isCollectionItem">
-                      <v-select
-                        :options="allValues[item.name]"
-                        @search:focus="setupData(item)"
-                        @option:selected="selectOption($event, item)"
-                      >
-                      </v-select>
-
-                      <select
-                        class="form-control"
-                        v-model="item.value"
-                        v-if="item.showInputAs == 'SELECT'"
-                      >
-                        <option
-                          v-for="option in item.options"
-                          v-bind:key="option.id"
-                          :value="option.id"
-                        >
-                          {{ option.text }}
-                        </option>
-                      </select>
-                    </div>
-                    <div v-else>
-                      <div v-if="item.type == 'DATE'">
-                        <input
-                          type="date"
-                          placeholder="Select Date"
-                          v-model="item.value"
-                        />
-                      </div>
-
-                      <div v-if="item.type == 'STRING'">
-                        <input
-                          type="text"
-                          v-model="item.value"
-                          class="form-control"
-                        />
-                      </div>
-                      <div
-                        class="custom-control form-control-lg custom-checkbox"
-                        v-if="item.type == 'BOOLEAN'"
-                      >
-                        <input
-                          type="checkbox"
-                          class="custom-control-input"
-                          id="customCheck1"
-                          v-model="item.value"
-                        />
-                        <label
-                          class="custom-control-label"
-                          for="customCheck1"
-                          >{{ item.name }}</label
-                        >
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <button
-                type="button"
-                class="btn btn-primary"
-                @click="generateReport"
-              >
-                Genereer Rapport
-              </button>
-            </div>
-          </div>
+  <private-view title="Rapportage">
+    <v-sheet>
+      <div class="container">
+        <div class="left">
+          <!-- Selecting the desired type of report to generate-->
+          <label>Type Rapport</label>
+          <v-select v-model="selectedReport" :items="reportOptions" />
+        </div>
+        <div class="right">
+          <!-- Selecting the desired output format-->
+          <label>Formaat</label>
+          <v-select
+            v-model="selectedOutput"
+            :items="[
+              {
+                text: 'PDF',
+                value: 'pdf',
+              },
+              {
+                text: 'Excel',
+                value: 'excel',
+              },
+              {
+                text: 'In scherm',
+                value: 'data',
+              },
+            ]"
+          />
         </div>
       </div>
-      <div class="row" v-if="renderedReport">
-        <div class="col-12">
-          <div class="card border-primary m-2">
-            <div class="card-header text-center primary">Rapport</div>
-            <div class="card-body">
-              <h5 class="card-title">{{ renderedReport.title }}</h5>
-              <p
-                class="card-text"
-                v-for="(paramItem, index) in renderedReport.parameters"
-                :key="`paramItem.name-${index}`"
-              >
-                {{ paramItem.name }} : {{ paramItem.value }} <br />
-              </p>
-              <p class="card-text">
-                moment van rapport: {{ renderedReport.currentDate }}
-              </p>
-            </div>
-          </div>
-        </div>
+      <div v-if="generatingReport">
+        <v-progress-circular indeterminate />
       </div>
-      <div class="row" v-if="renderedReport">
-        <div class="col-12">
-          <table class="table table-sm">
-            <thead class="thead-dark">
-              <tr>
-                <th
-                  scope="row"
-                  v-for="(key, index) in renderedReport.keys"
-                  :key="`key-${index}`"
+
+      <div
+        v-if="
+          selectedReportComputed &&
+          selectedReportComputed.parameterobject &&
+          selectedReportComputed.parameterobject.length > 0
+        "
+      >
+        <div v-if="gettingData">
+          <v-progress-circular indeterminate />
+        </div>
+        <div v-else>
+          <!-- Looping over every parameter and displaying the correct inputfield-->
+          <div
+            v-for="item in selectedReportComputed.parameterobject"
+            :key="item.name"
+            class="container"
+          >
+            <div class="left">
+              <label>{{ item.name }}</label>
+              <div v-if="item.isCollectionItem">
+                <!-- If the parameter is a collection, create a searchable dropdown, in which can be typed to search -->
+                <v-search-select
+                  :options="item.options"
+                  @option:selected="selectOption($event, item)"
                 >
-                  {{ key }}
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr
-                v-for="(dataItem, index) in renderedReport.data"
-                :key="`dataItem-${index}`"
-              >
-                <td
-                  v-for="(keyParam, index) in renderedReport.keys"
-                  :key="`keyParam-${index}`"
-                >
-                  {{ dataItem[keyParam] }}
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-      <div class="modal" tabindex="-1" role="dialog" id="myModal">
-        <div class="modal-dialog modal-lg" role="document">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title">{{ modalTitle }}</h5>
-              <button
-                type="button"
-                class="close"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-              >
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-            <div class="modal-body">
-              <p>{{ modalText }}</p>
-            </div>
-            <div class="modal-footer">
-              <button
-                type="button"
-                class="btn btn-primary"
-                data-bs-dismiss="modal"
-              >
-                OK
-              </button>
+                </v-search-select>
+                <!-- If showInputAs is set to SELECT, create a regular dropdown menu, without searching -->
+                <v-select
+                  v-model="item.value"
+                  v-if="item.showInputAs == 'SELECT'"
+                  :items="item.options"
+                />
+              </div>
+              <div v-else>
+                <div v-if="item.type == 'DATE'">
+                  <v-date-picker v-model="item.value" type="date" />
+                </div>
+
+                <div v-if="item.type == 'STRING'">
+                  <v-input v-model="item.value" />
+                </div>
+                <div v-if="item.type == 'BOOLEAN'">
+                  <v-checkbox v-model="item.value" :label="item.name" />
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
-      <div class="modal" tabindex="-1" role="dialog" id="myDownloadModal">
-        <div class="modal-dialog modal-lg" role="document">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title">Download File</h5>
-              <button
-                type="button"
-                class="close"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-              >
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-            <div class="modal-body">
-              <p>
-                downloadLink:
-                <a :href="fileLocation" target="_blank">{{ fileLocation }}</a>
-              </p>
-            </div>
-            <div class="modal-footer">
-              <button
-                type="button"
-                class="btn btn-primary"
-                data-bs-dismiss="modal"
-              >
-                Sluiten
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+      <!-- Button to generate report-->
+      <v-button @click="generateReport"> Genereer Rapport</v-button>
+    </v-sheet>
+
+    <!-- Show the report on the screen if needed-->
+    <div v-if="renderedReport">
+      <v-card :tile="false">
+        <v-card-title>{{ renderedReport.title }}</v-card-title>
+        <v-card-text
+          v-for="(paramItem, index) in renderedReport.parameters"
+          :key="`paramItem.name-${index}`"
+        >
+          {{ paramItem.name }} : {{ paramItem.value }} <br />
+        </v-card-text>
+
+        <v-card-text>
+          Moment van rapport: {{ renderedReport.currentDate }}
+        </v-card-text>
+      </v-card>
+
+      <v-table
+        :headers="renderedReport.keys"
+        :items="renderedReport.data"
+        show-resize
+      >
+      </v-table>
     </div>
+
+    <!-- Error dialog -->
+    <v-dialog v-model="errorDialogActive">
+      <v-sheet>
+        <h2>{{ modalTitle }}</h2>
+        <p>{{ modalText }}</p>
+        <v-button @click="errorDialogActive = false">OK</v-button>
+      </v-sheet>
+    </v-dialog>
+
+    <!-- Download dialog -->
+    <v-dialog v-model="downloadDialogActive">
+      <v-sheet>
+        <h2 style="font-weight: bold;">Download file</h2>
+        <p>
+          Download link:
+          <a :href="fileLocation" target="_blank">{{ fileLocation }}</a>
+        </p>
+        <p>
+          <v-button download :href="this.fileLocation" class="append"
+            >Download</v-button
+          >
+        </p>
+      </v-sheet>
+    </v-dialog>
   </private-view>
 </template>
 <script>
-
-import JQuery from "jquery";
-let $ = JQuery;
-
-import "bootstrap/dist/css/bootstrap.css";
-import bootstrap from "bootstrap/dist/js/bootstrap.js";
-
 import vSelect from "vue-select";
 import "vue-select/dist/vue-select.css";
 
 import * as jose from "jose";
+
+import axios from "axios";
+import { Directus } from "@directus/sdk";
 
 import environmentManager from "./environmentManager.js";
 const environmentSettings = environmentManager.getEnvironmentSettings();
@@ -259,9 +156,6 @@ const token = await new jose.SignJWT({
 })
   .setProtectedHeader({ alg: "HS256" })
   .sign(uint8array);
-
-import axios from "axios";
-import { Directus } from "@directus/sdk";
 
 const service = {
   settings: {
@@ -295,15 +189,20 @@ export default {
     return {
       allReports: [],
 
-      selectedReport: {},
+      selectedReport: "Selecteer rapport type",
       renderedReport: false,
-      selectedOutput: "",
+      selectedOutput: "Selecteer formaat",
       gettingData: false,
       generatingReport: false,
+
+      errorDialogActive: false,
       modalText: "",
       modalTitle: "",
+
+      downloadDialogActive: false,
       fileLocation: "",
 
+      value: "",
       allValues: {},
     };
   },
@@ -355,9 +254,14 @@ export default {
         });
     },
     selectOption(event, item) {
+      var option = item.options.find((obj) => {
+        return obj.id == event.id;
+      });
+
       this.selectedReport.parameterobject.forEach((element, index, array) => {
         if (item.name == element.name) {
           array[index].value = event.id;
+          array[index].text = option.text;
         }
       });
     },
@@ -388,21 +292,17 @@ export default {
       var error = false;
       this.modalTitle = "Ontbrekende Argumenten";
 
-      var myModal = new bootstrap.Modal(document.getElementById("myModal"), {
-        keyboard: false,
-      });
-
       if (!this.selectedReport || this.selectedReport == {}) {
         error = true;
         this.modalText = "Gelieve een rapport te kiezen";
-        myModal.show();
+        this.errorDialogActive = true;
         this.generatingReport = false;
         return;
       }
       if (!args.output || args.output == "") {
         error = true;
         this.modalText = "Gelieve een formaat voor het rapport te kiezen";
-        myModal.show();
+        this.errorDialogActive = true;
         this.generatingReport = false;
         return;
       }
@@ -416,29 +316,30 @@ export default {
         if (paramNotFilled) {
           error = true;
           this.modalText = "Gelieve alle parameters in te vullen";
-          myModal.show();
+          this.errorDialogActive = true;
           this.generatingReport = false;
           return;
         }
       }
-      var downloadModal = new bootstrap.Modal(
-        document.getElementById("myDownloadModal"),
-        {
-          keyboard: false,
-        }
-      );
 
       if (!error) {
         axiosInstance
           .post("/reports/generateReport", args)
           .then((resp) => {
             if (args.output == "data") {
+              //Format for v-table
+              resp.data.keys.forEach((item, index, array) => {
+                array[index] = {
+                  text: item.replace("_", " "),
+                  value: item,
+                };
+              });
+
               this.renderedReport = resp.data;
             } else {
-              // FileDownload(resp.data, 'report.pdf')
               this.fileLocation =
                 portalFileLink + resp.data.replace("public", "p");
-              downloadModal.show();
+              this.downloadDialogActive = true;
             }
           })
           .catch((err) => {
@@ -457,7 +358,7 @@ export default {
     this.getData();
   },
   components: {
-    vSelect,
+    "v-search-select": vSelect,
   },
   watch: {
     selectedReport: function (newSelectedReport) {
@@ -465,22 +366,28 @@ export default {
       if (this.selectedReport.parameterobject) {
         this.selectedReport.parameterobject.forEach(
           (paramItem, paramIndex, paramArray) => {
-            if (paramItem.isCollectionItem && paramItem.showInputAs == "SELECT")
+            if (
+              paramItem.isCollectionItem &&
+              (paramItem.showInputAs == "SELECT" ||
+                paramItem.showInputAs == "SEARCHBOX")
+            )
               client
                 .items(paramItem.collectionName)
                 .readByQuery({
                   fields: "*",
                 })
                 .then((resp) => {
+                  console.log(resp);
                   resp.data.forEach((item, index, array) => {
                     var txt = "";
                     paramItem.showProps.forEach((prop) => {
                       txt += item[prop] + " ";
                     });
                     array[index].text = txt;
+                    array[index].label = txt;
                   });
                   paramArray[paramIndex].options = resp.data;
-                  this.$forceUpdate();
+                  console.log(this.selectedReport);
                 })
                 .catch((err) => {
                   console.log(err);
@@ -496,12 +403,33 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 input,
 select {
   padding: 0.75em 0.5em;
   font-size: 100%;
   border: 1px solid #ccc;
   width: 100%;
+}
+
+.container {
+  width: 100%;
+}
+
+.v-button {
+  width: 98%;
+  padding: 0.5%;
+  margin: 0.5%;
+}
+.left,
+.right {
+  float: left;
+  width: 49%;
+  padding: 0.5%;
+  margin: 0.5%;
+}
+
+label {
+  font-weight: bold;
 }
 </style>

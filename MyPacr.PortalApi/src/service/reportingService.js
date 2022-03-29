@@ -181,7 +181,6 @@ var generateReport = payload => {
                   }
                 });
               }
-
               if (output == "data") {
                 //if output is data, return the data
                 var templateData = {
