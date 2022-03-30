@@ -2,6 +2,7 @@ const express = require('express')
 const router = express.Router()
 const jwt = require('jsonwebtoken')
 const directusService = require('../external/directusService')
+const config = require('config')
 
 router.post('/getAttendenceProfiles', (req, res) => {
   var auth = req.header('x-auth')

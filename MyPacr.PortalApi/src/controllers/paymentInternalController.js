@@ -48,6 +48,8 @@ router.post("/generatePayment", (req, res) => {
     directusService
       .createOnlinePayment(onlinePayment)
       .then(internalPayment => {
+        console.log("temp: ")
+        console.log(internalPayment)
         const portalSettings = config.get('portalSettings')
         onlinePayment = internalPayment
 

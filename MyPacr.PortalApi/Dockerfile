@@ -1,4 +1,5 @@
-FROM node:11.3.0
+#FROM node:11.3.0
+FROM node:14.2.0
 
 RUN apt-get update
 

@@ -12,7 +12,7 @@ const getLocalTimeFormated = () => {
 
 const formatTimeAsTrueLocalTimeDateAndTime = time => {
   let timeFormated =
-    moment(time).format("YYYY[-]MM[-]DD") + " " + moment(time).format("LTS");
+    moment(time).format("YYYY[-]MM[-]DD") + "T" + moment(time).format("LTS");
   return timeFormated;
 };
 

@@ -7,6 +7,7 @@ const axios = require('axios')
 const qs = require('qs')
 const userService = require('../service/userService')
 const smartschoolService = require('../external/smartschoolService')
+const { UsersHandler } = require('@directus/sdk')
 
 router.post('/register', (req, res, next) => {
   userService
@@ -29,9 +30,8 @@ router.post('/authenticate', (req, res, next) => {
     email: req.body.email,
     password: req.body.password
   }
-
-  userService
-    .handleOwnLogin(user)
+  console.log("Authenticate")
+  userService.handleOwnLogin(user)
     .then((result) => {
       result.token = jwt.sign({
         username: result.FullAccount.email,
@@ -39,9 +39,11 @@ router.post('/authenticate', (req, res, next) => {
       },
         config.get('jwt').secret
       )
+      console.log(result)
       res.status(200).send(result)
     })
     .catch(err => {
+      console.log(err)
       res.status(500).send(err)
     })
 })

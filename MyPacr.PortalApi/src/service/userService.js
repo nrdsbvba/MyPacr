@@ -10,14 +10,14 @@ var createSalt = util.promisify(crypto.randomBytes);
 var getHashedPassword = password => {
   return new Promise((resolve, reject) => {
     createSalt(32).then(result => {
-        argon.hash(password, result)
-          .then(hashedpsw => {
-            return resolve(hashedpsw)
-          })
-          .catch(err => {
-            return reject(err)
-          })
-      })
+      argon.hash(password, result)
+        .then(hashedpsw => {
+          return resolve(hashedpsw)
+        })
+        .catch(err => {
+          return reject(err)
+        })
+    })
       .catch(err => {
         return reject(err)
       })
@@ -32,11 +32,11 @@ var getByEmail = email => {
   return directusService.getByEmail(email)
 }
 
-var comparePassword = (user, password) => {}
+var comparePassword = (user, password) => { }
 
 var handleOwnLogin = user => {
   var loginObject = {}
-  var authSettingsOwn = global.generalSettings.auth_provider_settings.own
+  var authSettingsOwn = global.generalSettings.auth_provider_settings
   return new Promise((resolve, reject) => {
     if (authSettingsOwn.enabled === false) {
       return reject("Autentication method own not enabled in global settings")
@@ -59,6 +59,7 @@ var handleOwnLogin = user => {
           return resolve(loginObject);
         })
         .catch(err => {
+          console.log(err);
           return reject(err)
         })
     }
@@ -173,10 +174,10 @@ var handleSmartSchoolLogin = userinfo => {
             })
           }
           return directusService.updateCoAccount({
-              first_name: activeCoAccount.first_name,
-              last_name: activeCoAccount.last_name,
-              email: activeCoAccount.email
-            },
+            first_name: activeCoAccount.first_name,
+            last_name: activeCoAccount.last_name,
+            email: activeCoAccount.email
+          },
             activeCoAccount.id,
             userObject
           )

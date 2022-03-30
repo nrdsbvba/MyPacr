@@ -244,7 +244,7 @@ export default {
     createArticleThumbnail: function(article) {
       var filename = ''
       if (article.picture) {
-        filename = article.picture.filename_download
+        filename = article.picture.filename_disk
       }
       if (filename != '') {
         return tobackend.getThumbnail(filename, 300, 150, 'crop')
@@ -342,8 +342,6 @@ export default {
         newValue.forEach((article) => {
           if (article.categories && article.categories.length > 0) {
             article.categories.forEach((cat) => {
-              console.log(cat)
-              console.log(cat.articlecategories_id)
               if (
                 !this.currentCategoryButtons.some((btn) => {
                   return btn.caption == cat.articlecategories_id.name

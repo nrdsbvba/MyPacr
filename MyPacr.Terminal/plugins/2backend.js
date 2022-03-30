@@ -1,4 +1,4 @@
-import DirectusSDK from '@directus/sdk-js'
+import { Directus } from '@directus/sdk'
 const Promise = require('bluebird')
 const cronParser = require('cron-parser')
 const customDateHandler = require('../logic/dates/customDateHandler')
@@ -12,9 +12,7 @@ const service = {
   }
 }
 
-var client = new DirectusSDK({
-  url: service.settings.url,
-  project: service.settings.projectUrl,
+var client = new Directus(service.settings.url, {
   storage: window.sessionStorage
 })
 
@@ -24,18 +22,16 @@ service.isLoggedIn = (store) => {
 
 service.login = (store, email, password) => {
   return new Promise((resolve, reject) => {
-    client
+    client.auth
       .login({
         email: email,
         password: password
       })
       .then(() => {
-        return client.getMe({
-          fields: '*,avatar.*'
-        })
+        return client.users.me.read({ fields: "*,avatar.*" });
       })
       .then((resp) => {
-        store.commit('setLoggedInInfo', resp.data)
+        store.commit('setLoggedInInfo', resp)
         service.generateGlobalMasterKeyClient()
         return resolve(resp)
       })
@@ -47,10 +43,9 @@ service.login = (store, email, password) => {
 
 service.getMe = (store) => {
   return new Promise((resolve, reject) => {
-    client
-      .getMe({
-        fields: '*,avatar.*'
-      })
+    client.users.me.read({
+      fields: '*,avatar.*'
+    })
       .then((resp) => {
         store.commit('setLoggedInInfo', resp.data)
         return resolve(resp)
@@ -62,11 +57,12 @@ service.getMe = (store) => {
 }
 
 service.generateGlobalMasterKeyClient = () => {
-  client = new DirectusSDK({
-    url: service.settings.url,
-    project: service.settings.projectUrl,
-    token: service.settings.token
-  })
+  client = new Directus(
+    service.settings.url,
+    {
+      project: service.settings.projectUrl,
+      token: service.settings.token
+    })
 }
 
 service.getThumbnail = (
@@ -77,7 +73,6 @@ service.getThumbnail = (
 ) => {
   var thumbNailLink =
     service.settings.url +
-    '/_' +
     '/assets/' +
     fileName +
     '?w=' +
@@ -99,14 +94,14 @@ service.logOut = (store) => {
 
 service.getArticles = (store) => {
   return new Promise((resolve, reject) => {
-    client
-      .getItems('articles', {
+    client.items('articles')
+      .readByQuery({
         fields: '*,picture.*, prices.*, categories.*.*, vat_level.*',
         filter: {
           active: {
-            eq: 1
+            _eq: 1
           }
-        }
+        },
       })
       .then((resp) => {
         store.commit('setArticleList', resp.data)
@@ -128,18 +123,20 @@ service.getUserCardByCardId = (
   store.commit('setCurrentCustomerEntryFeePayedToday', null)
   store.commit('setCurrentCustomerEntryFeeRefunded', false)
   return new Promise((resolve, reject) => {
-    client
-      .getItems('cardleasings', {
-        fields:
-          '*, user.*, user.picture.*, user.campus.*, user.classgroup.*, user.usergroup.*.*.*, card.*, transactions.*, transactions.order.order_items.*.*, card_leasing_type.*, card_leasing_type.pricelevel.*',
-        filter: {
-          'card.code': {
-            eq: cardId
+    client.items('cardleasings').readByQuery({
+      fields:
+        '*, user.*, user.picture.*, user.campus.*, user.classgroup.*, user.usergroup.*.*.*, card.*, transactions.*, transactions.order.order_items.*.*, card_leasing_type.*, card_leasing_type.pricelevel.*',
+      filter: {
+        card: {
+          code: {
+            _eq: cardId
           }
         }
-      })
+      }
+    })
       .then((resp) => {
         //check through the card results and use the active card
+        console.log(resp)
         var activeCardLease = resp.data.find((element) => {
           var filterBool =
             new Date(element.from) < new Date() &&
@@ -193,15 +190,14 @@ service.getUserCardByCardId = (
 
 service.getCardForLinking = (store, cardId) => {
   return new Promise((resolve, reject) => {
-    client
-      .getItems('cards', {
-        fields: '*, card_leasings.*',
-        filter: {
-          code: {
-            eq: cardId
-          }
+    client.items('cards').readByQuery({
+      fields: '*, card_leasings.*',
+      filter: {
+        code: {
+          _eq: cardId
         }
-      })
+      }
+    })
       .then((resp) => {
         var noCard = resp.data.length == 0
         store.commit('setCurrentCardForLinkUnkown', noCard)
@@ -239,7 +235,7 @@ service.getCardForLinking = (store, cardId) => {
 service.getUserGroups = (store) => {
   return new Promise((resolve, reject) => {
     client
-      .getItems('usergroups', {
+      .items('usergroups').readByQuery({
         fields: '*,pricelevel.*'
       })
       .then((resp) => {
@@ -255,16 +251,21 @@ service.getUserGroups = (store) => {
 service.getUserSuggestionsBySearchKey = (query) => {
   return new Promise((resolve, reject) => {
     client
-      .getItems('users', {
+      .items('users').readByQuery({
         fields: '*',
         filter: {
-          first_name: {
-            like: query
-          },
-          last_name: {
-            logical: 'or',
-            like: query
-          }
+          _or: [
+            {
+              first_name: {
+                _contains: query
+              }
+            },
+            {
+              last_name: {
+                _contains: query
+              }
+            }
+          ]
         }
       })
       .then((resp) => {
@@ -282,16 +283,22 @@ service.getUserSuggestionsBySearchKey = (query) => {
 service.getCardSuggestionsBySearchKey = (query) => {
   return new Promise((resolve, reject) => {
     client
-      .getItems('cardleasings', {
+      .items('cardleasings')
+      .readByQuery({
         fields: '*,user.*,card.*',
         filter: {
-          'user.first_name': {
-            like: query
-          },
-          'user.last_name': {
-            logical: 'or',
-            like: query
-          }
+          _or: [
+            {
+              'user.first_name': {
+                _contains: query
+              }
+            },
+            {
+              'user.last_name': {
+                _contains: query
+              }
+            }
+          ]
         }
       })
       .then((resp) => {
@@ -324,12 +331,12 @@ service.getCardSuggestionsBySearchKey = (query) => {
 
 service.getUserByIdForLink = (store, id) => {
   return new Promise((resolve, reject) => {
-    client
-      .getItem('users', id, {
-        fields: '*, picture.*, campus.*, classgroup.*, usergroup.*.*.*'
-      })
+    client.items('users').readOne(id, {
+      fields: '*, picture.*, campus.*, classgroup.*, usergroup.*.*.*'
+    })
       .then((resp) => {
-        store.commit('setCurrentCustomerForLink', resp.data)
+        console.log(resp)
+        store.commit('setCurrentCustomerForLink', resp)
         return resolve(resp)
       })
       .catch((err) => {
@@ -340,12 +347,12 @@ service.getUserByIdForLink = (store, id) => {
 
 service.getGlobalSettings = (store) => {
   return new Promise((resolve, reject) => {
-    client
-      .getItems('globalsettings', {
-        fields: '*, default_pricelevel.*, '
+    client.items('globalsettings').readByQuery(
+      {
+        fields: '*, default_pricelevel.*'
       })
       .then((resp) => {
-        store.commit('setGlobalSettings', resp.data[0])
+        store.commit('setGlobalSettings', resp.data)
         return resolve(resp)
       })
       .catch((err) => {
@@ -356,10 +363,11 @@ service.getGlobalSettings = (store) => {
 
 service.getTerminalOptions = (store) => {
   return new Promise((resolve, reject) => {
-    client
-      .getItems('terminals', {
-        fields: '*, terminalfunctions.*.*'
-      })
+    client.items('terminals')
+      .readByQuery(
+        {
+          fields: '*, terminalfunctions.*.*'
+        })
       .then((resp) => {
         var unUsedTerminals = resp.data.filter((element) => {
           var filterBool =
@@ -379,11 +387,10 @@ service.getTerminalOptions = (store) => {
 
 service.setTerminal = (terminal, uuid, date) => {
   return new Promise((resolve, reject) => {
-    client
-      .updateItem('terminals', terminal.id, {
-        in_use_untill: date,
-        cookielink: uuid
-      })
+    client.items('terminals').updateOne(terminal.id, {
+      in_use_untill: date,
+      cookielink: uuid
+    })
       .then((resp) => {
         return resolve(resp)
       })
@@ -395,17 +402,17 @@ service.setTerminal = (terminal, uuid, date) => {
 
 service.getTerminal = (store, uuid) => {
   return new Promise((resolve, reject) => {
-    client
-      .getItems('terminals', {
-        fields: '*, terminalfunctions.*.*, selectedevent.*.*',
-        filter: {
-          cookielink: {
-            eq: uuid
-          }
+    client.items('terminals').readByQuery({
+      fields: '*, terminalfunctions.*.*, selectedevent.*.*',
+      filter: {
+        cookielink: {
+          _eq: uuid
         }
-      })
+      }
+    })
       .then((resp) => {
         store.commit('setCurrentTerminalInfo', resp.data[0])
+        console.log(resp.data)
         store.commit('setCurrentSelectedEvent', resp.data[0].selectedevent)
         return resolve(resp)
       })
@@ -608,19 +615,23 @@ vat turned off for globalsettings
       )
     }
 
-    client.createItem('transactions', theTransaction).then(() => {
-      return client
-        .updateItem('cardleasings', currentCustomer.id, {
+    const transactions = client.items('transactions');
+    const cardleasings = client.items('cardleasings');
+    const attendences = client.items('attendences');
+
+    transactions.createOne(theTransaction).then(() => {
+      return cardleasings.updateOne(currentCustomer.id,
+        {
           saldo: newSaldo
         })
         .then(() => {
-          return client.getItems('attendences', {
+          return attendences.readByQuery({
             filter: {
               user: {
-                eq: currentCustomer.user.id
+                _eq: currentCustomer.user.id
               },
               date: {
-                eq: moment().format('YYYY-MM-DD')
+                _eq: moment().format('YYYY-MM-DD')
               }
             }
           })
@@ -633,7 +644,7 @@ vat turned off for globalsettings
             }
           }
           if (resp.data.length == 0 && shouldTriggerAttendence) {
-            return client.createItem('attendences', attendence)
+            return attendences.createOne(attendence)
           } else {
             return resp
           }
@@ -641,7 +652,7 @@ vat turned off for globalsettings
         .then((resp) => {
           if (chargeEntryFee) {
             let time = customDateHandler.getLocalTimeFormated()
-            return client.createItem('transactions', {
+            return transactions.createOne({
               top_off: false,
               terminal: {
                 id: store.state.currentTerminalInfo.id
@@ -666,7 +677,7 @@ vat turned off for globalsettings
               refund_entry_fees_today.length == 0
             ) {
               let time = customDateHandler.getLocalTimeFormated()
-              return client.createItem('transactions', {
+              return transactions.createOne({
                 top_off: true,
                 terminal: {
                   id: store.state.currentTerminalInfo.id
@@ -691,7 +702,7 @@ vat turned off for globalsettings
         })
         .then((resp) => {
           if (chargeEntryFee) {
-            return client.updateItem('cardleasings', usercard.id, {
+            return cardleasings.updateOne(usercard.id, {
               saldo: newSaldo2
             })
           } else {
@@ -700,7 +711,7 @@ vat turned off for globalsettings
               entry_fees_today.length > 0 &&
               refund_entry_fees_today.length == 0
             ) {
-              return client.updateItem('cardleasings', usercard.id, {
+              return cardleasings.updateOne(usercard.id, {
                 saldo: newSaldo3
               })
             } else {
@@ -733,12 +744,12 @@ service.linkCard = (store, description, type) => {
       ')'
     //do flow to create card first
     return new Promise((resolve, reject) => {
-      client
-        .createItem('cards', {
-          code: cardId
-        })
+      client.items('cards').createOne({
+        code: cardId
+      })
         .then((resp) => {
-          return client.createItem('cardleasings', {
+          console.log(resp)
+          return client.items('cardleasings').createOne({
             description: description,
             saldo: 0,
             active: true,
@@ -773,8 +784,8 @@ service.linkCard = (store, description, type) => {
         ' (' +
         description +
         ')'
-      client
-        .createItem('cardleasings', {
+      client.items('cardleasings')
+        .createOne({
           description: description,
           saldo: 0,
           active: true,
@@ -855,14 +866,14 @@ service.createAttendence = (store) => {
     parseFloat(store.state.globalSettings.entry_fee)
 
   return new Promise((resolve, reject) => {
-    client
-      .getItems('attendences', {
+    client.items('attendences')
+      .readByQuery({
         filter: {
           user: {
-            eq: usercard.user.id
+            _eq: usercard.user.id
           },
           date: {
-            eq: moment().format('YYYY-MM-DD')
+            _eq: moment().format('YYYY-MM-DD')
           }
         }
       })
@@ -874,7 +885,7 @@ service.createAttendence = (store) => {
           }
         }
         if (resp.data.length == 0) {
-          return client.createItem('attendences', attendence)
+          return client.items('attendences').createOne(attendence)
         } else {
           return resp
         }
@@ -882,7 +893,7 @@ service.createAttendence = (store) => {
       .then((resp) => {
         if (chargeEntryFee) {
           let time = customDateHandler.getLocalTimeFormated()
-          return client.createItem('transactions', {
+          return client.items('transactions').createOne({
             top_off: false,
             terminal: {
               id: store.state.currentTerminalInfo.id
@@ -906,7 +917,7 @@ service.createAttendence = (store) => {
       })
       .then((resp) => {
         if (chargeEntryFee) {
-          return client.updateItem('cardleasings', usercard.id, {
+          return client.items('cardleasings').updateOne(usercard.id, {
             saldo: newSaldo
           })
         } else {
@@ -998,24 +1009,23 @@ service.createRegistration = (store) => {
         new Error('Kan niet registreren, scan valt buiten toegelaten tijd.')
       )
     } else {
-      return client
-        .getItems('eventregistration', {
-          fields: '*.*.*',
-          filter: {
-            time_of_registration: {
-              between: [
-                currentTimeSlotFrom.format('YYYY-MM-DD HH:mm:ss'),
-                currentTimeSlotTill.format('YYYY-MM-DD HH:mm:ss')
-              ]
-            },
-            participant: {
-              eq: store.state.currentParticipant.id
-            },
-            event: {
-              eq: theEvent.id
-            }
+      return client.items('eventregistration').readByQuery({
+        fields: '*.*.*',
+        filter: {
+          time_of_registration: {
+            _between: [
+              currentTimeSlotFrom.format('YYYY-MM-DD HH:mm:ss'),
+              currentTimeSlotTill.format('YYYY-MM-DD HH:mm:ss')
+            ]
+          },
+          participant: {
+            _eq: store.state.currentParticipant.id
+          },
+          event: {
+            _eq: theEvent.id
           }
-        })
+        }
+      })
         .then((resp) => {
           console.log(resp)
           var theObject = {
@@ -1028,7 +1038,7 @@ service.createRegistration = (store) => {
             time_of_registration: currentTIme.format('YYYY-MM-DD HH:mm:ss')
           }
           if (resp.data.length == 0) {
-            return client.createItem('eventregistration', theObject)
+            return client.items('eventregistration').createOne(theObject)
           } else {
             return reject(new Error('Gebruiker reeds geregistreerd'))
           }
@@ -1050,8 +1060,8 @@ service.createRegistration = (store) => {
 
 service.getCardLeasingTypeOptions = (store) => {
   return new Promise((resolve, reject) => {
-    client
-      .getItems('card_leasing_type', {
+    client.items('card_leasing_type').readByQuery(
+      {
         fields: '*, pricelevel.*'
       })
       .then((resp) => {
@@ -1067,8 +1077,8 @@ service.getCardLeasingTypeOptions = (store) => {
 
 service.getRegisteredEvents = (store) => {
   return new Promise((resolve, reject) => {
-    client
-      .getItems('events', {
+    client.items('events')
+      .readByQuery({
         fields: '*, event_type.*'
       })
       .then((resp) => {
