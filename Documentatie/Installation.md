@@ -1,36 +1,12 @@
 # Installation
-## 1. Directus V8 installeren
-> De outdated installatie guide van Directus kan [hier](https://v8.docs.directus.io/getting-started/installation.html) gevonden worden.
+## 1. Directus V9 installeren
+Volg installatie guide van Directus [hier](https://docs.directus.io/getting-started/installation/cli/).
 
-Installeer [MySQl](https://www.mysql.com/products/community/) **5.7+**, [PHP](https://www.php.net/downloads) **7.2+** en [Apache](https://httpd.apache.org/download.cgi) **2.4**.
-Deze kunnen apart geinstalleerd worden of via [XAMP](https://www.apachefriends.org/download.html) versie **7.4.27**.
-Hogere versies van XAMP werken **NIET**!
-
-
-
-Download Directus V8 via het officiele archief op [github](https://github.com/directus/v8-archive/releases).
-
-Extract het zip-bestand in een folder naar keuze.
-
-In `./apache/conf/httpd.conf` pas de `DocumentRoot` aan om te wijzen naar `your-path/directus-8.8.1/public`. Pas ook de `<Directory ...>` lijn eronder aan naar het ditzelfde pad.
-
-In de MySQL databank maak een nieuwe gebruiker aan en geef deze volledige rechten over een lege databank.
-
-Start de apache server en surf naar [`http://localhost/admin/#/install`](http://localhost/admin/#/install).
-
-Vul een super-admin wachtwoord in en klik op "Next".
-Klik nogmaals op "Next".
-Kies een project naam, en vul voor project token "_" in.
-Kies een email en wachtwoord voor de admin gebruiker.
-Vul in het volgende scherm de databank gegevens in. De databank user, password en name zijn de nieuw aangemaakte gebruiker en databank.
-
-In de databank zijn nu enkele tabellen aangemaakt die starten met "directus_". Verwijder al deze tabellen behalve `directus_users` aangezien hier het net aangemaakte Admin account in zit.
-
-Voer het `directus_setup.sql` bestand uit op de databank. Dit maakt alle nodige tabellen en relaties aan.
-
-Surf naar `http://localhost/admin/#/login` en log in met het aangemaakte admin account.
+In de databank verwijder alle tabellen aangemaakt door Directus. Voer het SQL-script `MyPacr/Docker/init.sql` uit. Dit script zorgt voor de correcte tabellen nodig voor MyPacr en plaatst hier begindata in.
 
 Directus is nu klaar. Voor meer informatie over elke collection klik [hier](https://github.com/nrdsbvba/MyPacr/tree/main/Documentatie/Collections.md)
+
+Surf naar [localhost:8055](localhost:8055) en log in met username: `admin@example.com` en password: `qwerty`
 
 ## 2. PortalAPi opzetten
 Installeer [Node.js](https://nodejs.org/en/download/)
@@ -89,8 +65,11 @@ SMARTSCHOOL_CLIENTID=123456abc
 Zorg dat PortalAPI en Directus draaien en dat Terminal niet draait op deze PC.
 Voer het commando `node ./node\_modules/nuxt/bin/nuxt.js` uit om het PortalFront project te starten.
 
-Surf naar [`localhost:3000/registreren`](localhost:3000/registreren).
-Maak een account aan en log in.
+Surf naar [`localhost:3000`](localhost:3000).
+En gebruik de volgende login
+email: `example@mypacr.be` en wachtwoord: `qwerty`
+
+> Alternatief: Maak een nieuw account aan [localhost:3000/registreren](localhost:3000/registreren)
 
 ## 4. Terminal opzetten
 Download het PortalFront project van [github](https://github.com/nrdsbvba/MyPacr/tree/main/MyPacr.Terminal).
@@ -111,9 +90,7 @@ DIRECTUS_API_TOKEN="token"
 Zorg dat PortalAPI en Directus draaien en dat PortalFront niet draait op deze PC.
 Voer het commando `node ./node\_modules/nuxt/bin/nuxt.js` uit om het Terminal project te starten.
 
-Ga naar de directus webinterface. Klik op de `Terminals` collection, en klik links boven op de plus om een nieuwe terminal te registreren. Vul de nodige velden in en klik op opslaan.
-
-Surf naar `localhost:3000/` en selecteer de nieuw aangemaakte terminal.
+Surf naar `localhost:3000/` en login met dezelfde login als Directus.
 
 ## 5. Omnikey 5427 CK Smart-card readers
 De aangerade smart-card readers zijn de [Omnikey 5427 CK ](https://www.hidglobal.com/products/readers/omnikey/5427).
@@ -140,6 +117,8 @@ Er is onmiddelijk een test api key beschikbaar. Om een live api key te krijgen m
 
 Deze api key kan je invullen in de settings van het PortalAPI project.
 
+> Het portalAPI project moet bereikbaar zijn via het internet om (echte of test) betalingen te kunnen uitvoeren
+
 ## 7. sync en reporting passphrases.
 
 Maak een POST request naar de API endpoints in [syncController](https://github.com/nrdsbvba/MyPacr/blob/main/MyPacr.PortalApi/src/controllers/syncController.js) of naar [reportingController](https://github.com/nrdsbvba/MyPacr/blob/main/MyPacr.PortalApi/src/controllers/reportingController.js). In de body van het request plaats:
@@ -160,10 +139,8 @@ Download het Rapportage project van [github](https://github.com/nrdsbvba/MyPacr/
 Voer `npm install` uit in de root-folder om de nodige npm pakketen te installeren.
 Voer vervolgens `npm run build` uit.
 
-Kopieer de 3 nieuwe bestanden van `./dist` naar `directus/public/extensions/custom/modules/Rapportage`
+Kopieer het `index.js` van `./dist` naar `directus/extensions/modules/Rapportage`
 > Maak de folders aan indien nodig.
-
-Hernoem `page.js` en `page.css` naar `module.js` en `module.css` respectievelijk.
 
 Maak in de folder Rapportage een nieuw bestand aan genaamd `environmentConfig.json` en plaats het volgende in dit bestand (pas aan waar nodig):
 ```
@@ -182,10 +159,8 @@ Maak in de folder Rapportage een nieuw bestand aan genaamd `environmentConfig.js
     }
   }
 }
-
 ```
-
-Er is nu een nieuw tab beschikbaar in directus.
+Er is nu een nieuw tab beschikbaar in het Directus dashboard waar rapporten kunnen worden gegenereerd.
 
 
 

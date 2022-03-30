@@ -8,7 +8,7 @@
 	],
 	"directus:extension": {
 		"type": "module",
-		"path": "C:/Users/Tobias Geyskens/Documents/NRDS/V9 Test/directusv9/extensions/modules/Rapportage/index.js",
+		"path": "./dist/index.js",
 		"source": "src/index.js",
 		"host": "^9.6.0"
 	},
