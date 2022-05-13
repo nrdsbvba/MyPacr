@@ -2,6 +2,8 @@
 
 Het MyPacr software system werd ontwikkeld door [NRDS](https://nrds.be/) in 2019. Door de coronacrisis is dit project stillgevallen. Om het geleverde werkt niet voor niets te hebben gedaan, is besloten dit open source aan te bieden.
 
+Wij zetten deze code open met de bedoeling dat scholen hier zelf mee verder aan de slag kunnen, het is uitdrukkelijk verboden om deze toepassing in zijn huidige vorm verder te verkopen. Elke nuttige aanpassing aan de code en de functionaliteiten moet verplicht ook via deze repository terugvloeien naar de scholen volgens het copyleft principe. Voor afwijkingingen op deze beide regels dient contact opgenomen te worden met nrds.
+
 ## Overzicht
 Elke student krijgt een [smartcard](https://en.wikipedia.org/wiki/Smart_card). Tijdens de middagpauze scant de student deze kaart om zijn/haar aanwezigheid te registreren. De student kan ook eten en drinken betalen met deze kaart. Het registreren en aankopen gebeurt via het Terminal project.
 
